@@ -3,12 +3,17 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>CRadio – Radio Vintage Interactiva</title>
+  <title>CRadio – Radio Vintage Full Size</title>
   <style>
     /* ======================
        GLOBAL & BODY
        ====================== */
     * { box-sizing: border-box; margin:0; padding:0; }
+    html, body {
+      height: 100%;
+      margin: 0;
+      overflow: hidden;
+    }
     body {
       background: #2c3e50;
       display: flex;
@@ -18,28 +23,76 @@
       min-height: 100vh;
       font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
       perspective: 1200px;
-      gap: 20px;
-      padding: 20px 0;
       transition: background 0.5s ease;
+      padding: 40px 20px;
     }
 
     body.dark { background: #0a0a0a; }
 
     /* ======================
-       RADIO CONTAINER
+       BOTÓN MODO OSCURO (EXTERNO, ARRIBA IZQUIERDA)
+       ====================== */
+    .theme-toggle {
+      position: fixed;
+      top: 20px;
+      left: 20px;
+      background: rgba(0,0,0,0.15);
+      border: 2px solid #999;
+      width: 44px;
+      height: 44px;
+      border-radius: 50%;
+      font-size: 20px;
+      cursor: pointer;
+      box-shadow: 0 3px 8px rgba(0,0,0,0.3);
+      transition: all 0.3s ease;
+      z-index: 1000;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    body.dark .theme-toggle {
+      background: rgba(255,107,53,0.15);
+      border: 2px solid #ff6b35;
+      box-shadow: 0 3px 8px rgba(0,0,0,0.7);
+    }
+
+    .theme-toggle:hover {
+      transform: scale(1.15);
+      box-shadow: 0 6px 16px rgba(0,0,0,0.4);
+    }
+
+    body.dark .theme-toggle:hover {
+      box-shadow: 0 0 16px #ff4500;
+    }
+
+    .theme-toggle .icon {
+      transition: opacity 0.3s ease;
+    }
+
+    .theme-toggle .sun { opacity: 1; color: #f39c12; }
+    .theme-toggle .moon { opacity: 0; position: absolute; color: #ff6b35; }
+
+    body.dark .theme-toggle .sun { opacity: 0; }
+    body.dark .theme-toggle .moon { opacity: 1; }
+
+    /* ======================
+       RADIO CONTAINER (MÁS GRANDE)
        ====================== */
     .radio {
-      width: 720px;
-      height: 460px;
+      width: 90vw;
+      max-width: 1100px;
+      height: 70vh;
+      min-height: 500px;
       background: linear-gradient(145deg, #e6f0fa, #c8d9eb);
-      border-radius: 28px;
+      border-radius: 36px;
       box-shadow: 
-        0 30px 60px rgba(0,0,0,0.45),
-        inset 0 -8px 12px rgba(0,0,0,0.15),
-        inset 0 8px 12px rgba(255,255,255,0.6);
+        0 40px 80px rgba(0,0,0,0.5),
+        inset 0 -10px 16px rgba(0,0,0,0.15),
+        inset 0 10px 16px rgba(255,255,255,0.7);
       position: relative;
       transform-style: preserve-3d;
-      transform: rotateX(8deg) rotateY(-4deg);
+      transform: rotateX(6deg) rotateY(-3deg);
       overflow: hidden;
       transition: all 0.5s ease;
     }
@@ -47,49 +100,51 @@
     .radio.dark {
       background: linear-gradient(145deg, #1a1a1a, #262626);
       box-shadow: 
-        0 30px 60px rgba(0,0,0,0.8),
-        inset 0 -8px 12px rgba(0,0,0,0.4),
-        inset 0 8px 12px rgba(255,255,255,0.05);
+        0 40px 80px rgba(0,0,0,0.85),
+        inset 0 -10px 16px rgba(0,0,0,0.4),
+        inset 0 10px 16px rgba(255,255,255,0.05);
     }
 
     /* ======================
-       CLOCK SECTION
+       CLOCK SECTION (ESCALADO)
        ====================== */
     .clock-section {
       position: absolute;
-      top: 20px;
+      top: 5%;
       left: 50%;
       transform: translateX(-50%);
-      width: 180px;
-      height: 180px;
+      width: 22%;
+      max-width: 220px;
+      height: auto;
+      aspect-ratio: 1;
       background: radial-gradient(circle at 30% 30%, #fff, #e0e0e0);
       border-radius: 50%;
       box-shadow: 
-        inset 0 6px 12px rgba(0,0,0,0.2),
-        0 8px 20px rgba(0,0,0,0.3);
-      border: 12px solid #d4af37;
+        inset 0 8px 16px rgba(0,0,0,0.2),
+        0 10px 24px rgba(0,0,0,0.3);
+      border: 14px solid #d4af37;
       z-index: 10;
       transition: all 0.5s ease;
     }
 
     .radio.dark .clock-section {
       background: radial-gradient(circle at 30% 30%, #2d2d2d, #1f1f1f);
-      border: 12px solid #8b5a2b;
+      border: 14px solid #8b5a2b;
       box-shadow: 
-        inset 0 6px 12px rgba(0,0,0,0.6),
-        0 8px 20px rgba(0,0,0,0.7);
+        inset 0 8px 16px rgba(0,0,0,0.6),
+        0 10px 24px rgba(0,0,0,0.7);
     }
 
     .clock-face {
       position: absolute;
-      inset: 12px;
+      inset: 14px;
       background: #fafafa;
       border-radius: 50%;
       display: flex;
       align-items: center;
       justify-content: center;
       font-weight: bold;
-      font-size: 24px;
+      font-size: 1.8vw;
       color: #333;
       letter-spacing: 1px;
       transition: all 0.5s ease;
@@ -98,7 +153,7 @@
     .radio.dark .clock-face {
       background: #111;
       color: #ff6b35;
-      text-shadow: 0 0 10px #ff6b35, 0 0 20px #ff4500;
+      text-shadow: 0 0 12px #ff6b35, 0 0 24px #ff4500;
     }
 
     .hand { background: #333; transition: all 0.5s ease; }
@@ -108,26 +163,28 @@
     .radio.dark .center { background: #8b5a2b; }
 
     /* ======================
-       SPEAKER GRILL
+       SPEAKER GRILL (ESCALADO)
        ====================== */
     .grill {
       position: absolute;
-      top: 170px;
+      top: 28%;
       left: 50%;
       transform: translateX(-50%);
-      width: 460px;
-      height: 180px;
+      width: 58%;
+      max-width: 520px;
+      height: 28%;
+      min-height: 160px;
       background: repeating-linear-gradient(
         45deg,
         #d4af37 0px,
-        #d4af37 8px,
-        #c9a63a 8px,
-        #c9a63a 16px
+        #d4af37 10px,
+        #c9a63a 10px,
+        #c9a63a 20px
       );
-      border-radius: 18px;
+      border-radius: 22px;
       box-shadow: 
-        inset 0 0 20px rgba(0,0,0,0.3),
-        0 6px 12px rgba(0,0,0,0.2);
+        inset 0 0 24px rgba(0,0,0,0.3),
+        0 8px 16px rgba(0,0,0,0.2);
       overflow: hidden;
       transition: all 0.5s ease;
     }
@@ -136,51 +193,53 @@
       background: repeating-linear-gradient(
         45deg,
         #8b5a2b 0px,
-        #8b5a2b 8px,
-        #a0522d 8px,
-        #a0522d 16px
+        #8b5a2b 10px,
+        #a0522d 10px,
+        #a0522d 20px
       );
       box-shadow: 
-        inset 0 0 20px rgba(0,0,0,0.7),
-        0 6px 12px rgba(0,0,0,0.6);
+        inset 0 0 24px rgba(0,0,0,0.7),
+        0 8px 16px rgba(0,0,0,0.6);
     }
 
     .grill::before {
       content: '';
       position: absolute;
-      inset: 12px;
+      inset: 14px;
       background: #111;
-      border-radius: 12px;
+      border-radius: 14px;
     }
 
     .radio.dark .grill::before { background: #000; }
 
     /* ======================
-       DIAL WINDOW
+       DIAL WINDOW (ESCALADO)
        ====================== */
     .dial-window {
       position: absolute;
-      bottom: 110px;
+      bottom: 22%;
       left: 50%;
       transform: translateX(-50%);
-      width: 560px;
-      height: 90px;
+      width: 70%;
+      max-width: 680px;
+      height: 14%;
+      min-height: 90px;
       background: linear-gradient(to bottom, #222, #111);
-      border-radius: 16px;
+      border-radius: 18px;
       box-shadow: 
-        inset 0 8px 16px rgba(255,255,255,0.1),
-        0 8px 16px rgba(0,0,0,0.4);
+        inset 0 10px 20px rgba(255,255,255,0.1),
+        0 10px 20px rgba(0,0,0,0.4);
       overflow: hidden;
-      border: 4px solid #333;
+      border: 5px solid #333;
       transition: all 0.5s ease;
     }
 
     .radio.dark .dial-window {
       background: linear-gradient(to bottom, #0a0a0a, #000);
       box-shadow: 
-        inset 0 8px 16px rgba(255,107,53,0.1),
-        0 8px 16px rgba(0,0,0,0.8);
-      border: 4px solid #333;
+        inset 0 10px 20px rgba(255,107,53,0.1),
+        0 10px 20px rgba(0,0,0,0.8);
+      border: 5px solid #333;
     }
 
     /* ======================
@@ -191,40 +250,40 @@
       top: 50%;
       left: 50%;
       transform: translate(-50%, -50%);
-      width: 540px;
-      height: 50px;
+      width: 96%;
+      height: 60%;
       display: flex;
       justify-content: space-between;
       align-items: center;
-      padding: 0 20px;
+      padding: 0 5%;
       font-weight: bold;
-      font-size: 15px;
+      font-size: 1.4vw;
       transition: all 0.5s ease;
     }
 
     .station-list { color: #333; text-shadow: 0 1px 1px rgba(255,255,255,0.8); }
-    .radio.dark .station-list { color: #ff6b35; text-shadow: 0 0 6px #ff4500, 0 1px 1px #000; }
+    .radio.dark .station-list { color: #ff6b35; text-shadow: 0 0 8px #ff4500, 0 1px 1px #000; }
 
     .station {
       cursor: pointer;
-      padding: 4px 8px;
-      border-radius: 4px;
+      padding: 6px 10px;
+      border-radius: 6px;
       transition: all 0.3s;
       position: relative;
       z-index: 2;
     }
 
-    .station:hover { background: rgba(255,204,128,0.3); color: #000; text-shadow: 0 0 8px #fff; }
-    .radio.dark .station:hover { background: rgba(255,107,53,0.25); color: #fff; text-shadow: 0 0 12px #ff6b35; }
+    .station:hover { background: rgba(255,204,128,0.3); color: #000; text-shadow: 0 0 10px #fff; }
+    .radio.dark .station:hover { background: rgba(255,107,53,0.25); color: #fff; text-shadow: 0 0 14px #ff6b35; }
 
     .station.active {
       color: #fff;
-      font-size: 16px;
-      text-shadow: 0 0 12px #ff6b35, 0 0 20px #ff4500, 0 1px 1px #000;
+      font-size: 1.5vw;
+      text-shadow: 0 0 14px #ff6b35, 0 0 24px #ff4500, 0 1px 1px #000;
     }
 
     .radio.dark .station.active {
-      text-shadow: 0 0 12px #ff6b35, 0 0 20px #ff4500, 0 0 30px #ff4500;
+      text-shadow: 0 0 14px #ff6b35, 0 0 24px #ff4500, 0 0 36px #ff4500;
     }
 
     /* ======================
@@ -232,22 +291,22 @@
        ====================== */
     .dropdown-container {
       position: absolute;
-      top: 20px;
-      right: 20px;
+      top: 5%;
+      right: 5%;
       z-index: 30;
     }
 
     .dropdown {
-      width: 180px;
-      padding: 10px;
-      font-size: 14px;
+      width: 200px;
+      padding: 12px;
+      font-size: 1.1vw;
       font-weight: bold;
       border: 2px solid #999;
-      border-radius: 8px;
+      border-radius: 10px;
       background: #f0f0f0;
       color: #333;
       cursor: pointer;
-      box-shadow: 0 3px 6px rgba(0,0,0,0.3);
+      box-shadow: 0 4px 8px rgba(0,0,0,0.3);
       transition: all 0.3s ease;
     }
 
@@ -255,18 +314,18 @@
       background: #2a2a2a;
       border: 2px solid #555;
       color: #ff6b35;
-      box-shadow: 0 3px 6px rgba(0,0,0,0.7);
+      box-shadow: 0 4px 8px rgba(0,0,0,0.7);
     }
 
     .dropdown:focus {
       outline: none;
       border-color: #ff6b35;
-      box-shadow: 0 0 8px #ff4500;
+      box-shadow: 0 0 10px #ff4500;
     }
 
     .radio.dark .dropdown:focus {
       border-color: #ff4500;
-      box-shadow: 0 0 12px #ff6b35;
+      box-shadow: 0 0 14px #ff6b35;
     }
 
     /* ======================
@@ -274,21 +333,21 @@
        ====================== */
     .pointer {
       position: absolute;
-      bottom: 10px;
+      bottom: 8px;
       left: 50%;
       transform: translateX(-50%);
       width: 0;
       height: 0;
-      border-left: 12px solid transparent;
-      border-right: 12px solid transparent;
-      border-top: 24px solid #c00;
-      filter: drop-shadow(0 2px 4px rgba(0,0,0,0.5));
+      border-left: 14px solid transparent;
+      border-right: 14px solid transparent;
+      border-top: 28px solid #c00;
+      filter: drop-shadow(0 3px 6px rgba(0,0,0,0.5));
       transition: left 0.4s ease, border-top-color 0.5s ease;
     }
 
     .radio.dark .pointer {
       border-top-color: #ff6b35;
-      filter: drop-shadow(0 0 12px #ff4500);
+      filter: drop-shadow(0 0 14px #ff4500);
     }
 
     /* ======================
@@ -296,25 +355,25 @@
        ====================== */
     .controls {
       position: absolute;
-      bottom: 28px;
+      bottom: 5%;
       width: 100%;
       display: flex;
       justify-content: space-evenly;
-      padding: 0 60px;
+      padding: 0 8%;
       z-index: 20;
     }
 
     button {
-      width: 60px;
-      height: 36px;
+      width: 70px;
+      height: 42px;
       background: linear-gradient(to bottom, #f0f0f0, #d0d0d0);
       border: 2px solid #999;
-      border-radius: 8px;
+      border-radius: 10px;
       font-weight: bold;
-      font-size: 12px;
+      font-size: 13px;
       color: #333;
       cursor: pointer;
-      box-shadow: 0 3px 6px rgba(0,0,0,0.3), inset 0 1px 2px rgba(255,255,255,0.8);
+      box-shadow: 0 4px 8px rgba(0,0,0,0.3), inset 0 1px 3px rgba(255,255,255,0.8);
       transition: all 0.15s;
       user-select: none;
     }
@@ -323,20 +382,20 @@
       background: linear-gradient(to bottom, #2a2a2a, #1a1a1a);
       border: 2px solid #444;
       color: #ff6b35;
-      box-shadow: 0 3px 6px rgba(0,0,0,0.7), inset 0 1px 2px rgba(255,107,53,0.2);
+      box-shadow: 0 4px 8px rgba(0,0,0,0.7), inset 0 1px 3px rgba(255,107,53,0.2);
     }
 
-    button:hover { background: linear-gradient(to bottom, #fff, #e0e0e0); transform: translateY(-1px); }
-    .radio.dark button:hover { background: linear-gradient(to bottom, #3a3a3a, #2a2a2a); transform: translateY(-1px); }
+    button:hover { background: linear-gradient(to bottom, #fff, #e0e0e0); transform: translateY(-2px); }
+    .radio.dark button:hover { background: linear-gradient(to bottom, #3a3a3a, #2a2a2a); transform: translateY(-2px); }
 
-    button:active { transform: translateY(1px); box-shadow: 0 1px 3px rgba(0,0,0,0.4); }
+    button:active { transform: translateY(1px); box-shadow: 0 2px 4px rgba(0,0,0,0.4); }
 
     .btn-label {
-      font-size: 11px;
+      font-size: 12px;
       color: #444;
       font-weight: bold;
       text-shadow: 0 1px 1px #fff;
-      margin-top: 2px;
+      margin-top: 4px;
       transition: all 0.5s ease;
     }
 
@@ -347,81 +406,70 @@
        ====================== */
     .logo {
       position: absolute;
-      top: 24px;
-      left: 32px;
+      top: 5%;
+      left: 5%;
       font-family: 'Courier New', monospace;
       font-weight: bold;
-      font-size: 24px;
+      font-size: 2.8vw;
       color: #c00;
-      text-shadow: 1px 1px 0 #fff;
-      letter-spacing: 3px;
+      text-shadow: 2px 2px 0 #fff;
+      letter-spacing: 4px;
       transition: all 0.5s ease;
     }
 
     .radio.dark .logo {
       color: #ff6b35;
-      text-shadow: 1px 1px 0 #000, 0 0 12px #ff4500;
+      text-shadow: 2px 2px 0 #000, 0 0 14px #ff4500;
     }
 
     /* ======================
        PANEL DE CONTROL
        ====================== */
     .control-panel {
+      margin-top: 20px;
       background: #1a1a1a;
-      padding: 16px 24px;
-      border-radius: 12px;
+      padding: 18px 30px;
+      border-radius: 14px;
       color: #ff6b35;
       font-family: 'Courier New', monospace;
-      font-size: 14px;
-      box-shadow: 0 8px 20px rgba(0,0,0,0.5);
+      font-size: 1.1vw;
+      box-shadow: 0 10px 24px rgba(0,0,0,0.5);
       text-align: center;
-      width: 720px;
+      width: 90vw;
+      max-width: 1100px;
       transition: all 0.5s ease;
     }
 
     body.dark .control-panel {
       background: #000;
-      box-shadow: 0 8px 20px rgba(0,0,0,0.9);
+      box-shadow: 0 10px 24px rgba(0,0,0,0.9);
     }
 
-    .freq { font-size: 18px; font-weight: bold; color: #ff6b35; }
+    .freq { font-size: 1.6vw; font-weight: bold; color: #ff6b35; }
 
-    /* ======================
-       BOTÓN MODO OSCURO
-       ====================== */
-    .theme-toggle {
-      position: absolute;
-      top: 20px;
-      right: 220px;
-      background: #333;
-      color: #fff;
-      border: none;
-      width: 50px;
-      height: 50px;
-      border-radius: 50%;
-      font-size: 20px;
-      cursor: pointer;
-      box-shadow: 0 4px 10px rgba(0,0,0,0.4);
-      transition: all 0.3s;
-      z-index: 100;
+    /* Responsive para pantallas pequeñas */
+    @media (max-width: 768px) {
+      .clock-face, .station-list, .dropdown, .logo, .control-panel, .freq { font-size: 3.5vw !important; }
+      .station.active { font-size: 4vw !important; }
+      .controls button { width: 60px; height: 38px; font-size: 11px; }
     }
-
-    .theme-toggle:hover { transform: scale(1.1); box-shadow: 0 6px 16px rgba(0,0,0,0.5); }
-    body.dark .theme-toggle { background: #ff6b35; color: #000; }
   </style>
 </head>
 <body>
 
-  <!-- BOTÓN MODO OSCURO -->
-  <button class="theme-toggle" id="themeToggle">Moon</button>
+  <!-- BOTÓN MODO OSCURO (EXTERNO, ARRIBA IZQUIERDA) -->
+  <button class="theme-toggle" id="themeToggle">
+    <span class="icon sun">Sun</span>
+    <span class="icon moon">Moon</span>
+  </button>
 
-  <!-- CRADIO -->
+  <!-- CRADIO (MÁS GRANDE) -->
   <div class="radio" id="radio">
     <div class="logo">CRADIO</div>
 
     <!-- Reloj -->
     <div class="clock-section">
-      <div class="clock-face" id="clockDisplay">17:00</div>
+      <div class="clock-face" id="clockDisplay">17:10</div>
       <div class="clock-hands">
         <div class="hand hour" id="hourHand"></div>
         <div class="hand minute" id="minuteHand"></div>
@@ -509,7 +557,7 @@
     ];
     let currentIndex = 4;
 
-    // Reloj en tiempo real (Perú, 11 de noviembre de 2025, 05:00 PM)
+    // Reloj en tiempo real
     function updateClock() {
       const now = new Date();
       const hours = now.getHours() % 12 || 12;
@@ -535,10 +583,10 @@
       document.getElementById('stationSelect').value = currentIndex;
 
       const pointer = document.getElementById('pointer');
-      const dialWidth = 540;
+      const dialWidth = document.querySelector('.dial-window').offsetWidth * 0.96;
       const minFreq = 88, maxFreq = 106;
       const percent = (stations[currentIndex].freq - minFreq) / (maxFreq - minFreq);
-      const leftPos = 20 + (percent * (dialWidth - 40));
+      const leftPos = (dialWidth * percent) + (document.querySelector('.dial-window').offsetLeft - document.querySelector('.radio').offsetLeft) + 20;
       pointer.style.left = `${leftPos}px`;
     }
 
@@ -590,11 +638,11 @@
     toggle.addEventListener('click', () => {
       body.classList.toggle('dark');
       radio.classList.toggle('dark');
-      toggle.textContent = body.classList.contains('dark') ? 'Sun' : 'Moon';
     });
 
     // Inicializar
     updateActiveStation();
+    window.addEventListener('resize', updateActiveStation);
   </script>
 
 </body>
