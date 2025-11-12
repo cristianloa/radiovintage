@@ -30,7 +30,7 @@
     body.dark { background: #0a0a0a; }
 
     /* ======================
-       BOTÓN MODO OSCURO (EXTERNO, ARRIBA IZQUIERDA)
+       BOTÓN MODO OSCURO (ICONO SOL/LUNA)
        ====================== */
     .theme-toggle {
       position: fixed;
@@ -41,7 +41,7 @@
       width: 44px;
       height: 44px;
       border-radius: 50%;
-      font-size: 20px;
+      font-size: 26px;
       cursor: pointer;
       box-shadow: 0 3px 8px rgba(0,0,0,0.3);
       transition: all 0.3s ease;
@@ -49,6 +49,7 @@
       display: flex;
       align-items: center;
       justify-content: center;
+      font-family: 'Segoe UI Emoji', sans-serif;
     }
 
     body.dark .theme-toggle {
@@ -70,8 +71,8 @@
       transition: opacity 0.3s ease;
     }
 
-    .theme-toggle .sun { opacity: 1; color: #f39c12; }
-    .theme-toggle .moon { opacity: 0; position: absolute; color: #ff6b35; }
+    .theme-toggle .sun { opacity: 1; }
+    .theme-toggle .moon { opacity: 0; position: absolute; }
 
     body.dark .theme-toggle .sun { opacity: 0; }
     body.dark .theme-toggle .moon { opacity: 1; }
@@ -351,7 +352,7 @@
     }
 
     /* ======================
-       BOTONES
+       BOTONES CON ICONOS
        ====================== */
     .controls {
       position: absolute;
@@ -370,12 +371,16 @@
       border: 2px solid #999;
       border-radius: 10px;
       font-weight: bold;
-      font-size: 13px;
+      font-size: 18px;
       color: #333;
       cursor: pointer;
       box-shadow: 0 4px 8px rgba(0,0,0,0.3), inset 0 1px 3px rgba(255,255,255,0.8);
       transition: all 0.15s;
       user-select: none;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-family: 'Segoe UI Emoji', sans-serif;
     }
 
     .radio.dark button {
@@ -451,16 +456,16 @@
     @media (max-width: 768px) {
       .clock-face, .station-list, .dropdown, .logo, .control-panel, .freq { font-size: 3.5vw !important; }
       .station.active { font-size: 4vw !important; }
-      .controls button { width: 60px; height: 38px; font-size: 11px; }
+      .controls button { width: 60px; height: 38px; font-size: 16px; }
     }
   </style>
 </head>
 <body>
 
-  <!-- BOTÓN MODO OSCURO (EXTERNO, ARRIBA IZQUIERDA) -->
+  <!-- BOTÓN MODO OSCURO (ICONO SOL/LUNA) -->
   <button class="theme-toggle" id="themeToggle">
-    <span class="icon sun">Sun</span>
-    <span class="icon moon">Moon</span>
+    <span class="icon sun">☀</span>
+    <span class="icon moon">🌙</span>
   </button>
 
   <!-- CRADIO (MÁS GRANDE) -->
@@ -469,7 +474,7 @@
 
     <!-- Reloj -->
     <div class="clock-section">
-      <div class="clock-face" id="clockDisplay">17:10</div>
+      <div class="clock-face" id="clockDisplay">17:20</div>
       <div class="clock-hands">
         <div class="hand hour" id="hourHand"></div>
         <div class="hand minute" id="minuteHand"></div>
@@ -507,29 +512,29 @@
       </select>
     </div>
 
-    <!-- BOTONES DEBAJO -->
+    <!-- BOTONES CON ICONOS -->
     <div class="controls">
       <div class="btn-group">
-        <button onclick="changeVolume(1)">VOL +</button>
-        <button onclick="changeVolume(-1)">VOL -</button>
+        <button onclick="changeVolume(1)">Up Arrow</button>
+        <button onclick="changeVolume(-1)">Down Arrow</button>
         <div class="btn-label">VOLUMEN</div>
       </div>
 
       <div class="btn-group">
-        <button onclick="tunePrev()">PREV</button>
-        <button onclick="tuneNext()">NEXT</button>
+        <button onclick="tunePrev()">Left Double Arrow</button>
+        <button onclick="tuneNext()">Right Double Arrow</button>
         <div class="btn-label">SINTONÍA</div>
       </div>
 
       <div class="btn-group">
-        <button onclick="changeTone('bass')">BASS</button>
-        <button onclick="changeTone('treble')">TREBLE</button>
+        <button onclick="changeTone('bass')">Speaker</button>
+        <button onclick="changeTone('treble')">Speaker</button>
         <div class="btn-label">TONO</div>
       </div>
 
       <div class="btn-group">
-        <button onclick="setAlarm()">ALARM</button>
-        <button onclick="resetClock()">RESET</button>
+        <button onclick="setAlarm()">Bell</button>
+        <button onclick="resetClock()">Clock</button>
         <div class="btn-label">RELOJ</div>
       </div>
     </div>
