@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>CRadio – Hamburguesa + ON/OFF Desplegable + Iconos + Marcador Fijo</title>
+  <title>CRadio – Estado Persistente + Animación + Marcador Fijo</title>
   <style>
     /* ======================
        GLOBAL & BODY
@@ -180,7 +180,7 @@
     }
 
     /* ======================
-       TOP CONTROLS: ON/OFF DESPLEGABLE + HAMBURGUESA
+       TOP CONTROLS
        ====================== */
     .top-controls {
       position: absolute;
@@ -192,7 +192,7 @@
       z-index: 15;
     }
 
-    /* BOTÓN ON/OFF: DESPLEGABLE CLÁSICO */
+    /* ON/OFF DESPLEGABLE */
     #powerBtn {
       width: 70px;
       height: 40px;
@@ -265,7 +265,7 @@
     #powerBtn.on .on-label { opacity: 1; }
     #powerBtn.on::before { transform: translateX(34px); }
 
-    /* BOTÓN ESTACIONES: HAMBURGUESA + TEXTO DEBAJO */
+    /* ESTACIONES: HAMBURGUESA */
     .stations-btn {
       display: flex;
       flex-direction: column;
@@ -411,7 +411,7 @@
     .radio.dark .grill::before { background: #000; }
 
     /* ======================
-       DIAL: CARRUSEL + MARCADOR FIJO
+       DIAL + MARCADOR FIJO
        ====================== */
     .dial-window {
       position: absolute;
@@ -475,16 +475,64 @@
       color: #ff8c00;
     }
 
+    /* ANIMACIÓN EN ESTACIÓN ACTIVA */
+    .station-item.active {
+      color: #fff;
+      font-size: 1.5vw;
+      text-shadow: 
+        0 0 8px #ff6b35,
+        0 0 16px #ff4500,
+        0 0 24px #ff4500,
+        0 0 32px #ff4500;
+      background: rgba(255,107,53,0.3);
+      transform: scale(1.1);
+      z-index: 2;
+      animation: pulseGlow 1.5s ease-in-out infinite alternate;
+    }
+
+    @keyframes pulseGlow {
+      0% {
+        text-shadow: 
+          0 0 8px #ff6b35,
+          0 0 16px #ff4500,
+          0 0 24px #ff4500,
+          0 0 32px #ff4500;
+        transform: scale(1.1);
+      }
+      100% {
+        text-shadow: 
+          0 0 12px #ff6b35,
+          0 0 24px #ff4500,
+          0 0 36px #ff4500,
+          0 0 48px #ff4500;
+        transform: scale(1.15);
+      }
+    }
+
+    .station-item:hover:not(.active) {
+      color: #fff;
+      background: rgba(255,255,255,0.1);
+    }
+
+    .radio.dark .station-item:hover:not(.active) {
+      background: rgba(255,107,53,0.15);
+    }
+
+    /* MARCADOR FIJO */
     .station-marker {
       position: absolute;
-      top: -28px;
+      top: -32px;
       left: 50%;
       transform: translateX(-50%);
-      width: 14px;
-      height: 14px;
+      width: 16px;
+      height: 16px;
       background: #c00;
       border-radius: 50%;
-      box-shadow: 0 0 16px #c00, 0 0 24px #c00;
+      box-shadow: 
+        0 0 16px #c00,
+        0 0 24px #c00,
+        0 0 32px #c00,
+        0 4px 8px rgba(0,0,0,0.6);
       z-index: 10;
       pointer-events: none;
       transition: left 0.6s cubic-bezier(0.4, 0, 0.2, 1);
@@ -492,11 +540,15 @@
 
     .radio.dark .station-marker {
       background: #ff6b35;
-      box-shadow: 0 0 20px #ff4500, 0 0 30px #ff4500;
+      box-shadow: 
+        0 0 20px #ff4500,
+        0 0 30px #ff4500,
+        0 0 40px #ff4500,
+        0 4px 12px rgba(0,0,0,0.8);
     }
 
     /* ======================
-       CONTROLES: ICONOS + +/-
+       CONTROLES
        ====================== */
     .playback-controls {
       position: absolute;
@@ -554,7 +606,7 @@
       box-shadow: 0 4px 8px rgba(0,0,0,0.4);
     }
 
-    /* VOLUMEN: SOLO + y - */
+    /* VOLUMEN */
     .volume-container {
       display: flex;
       align-items: center;
@@ -607,7 +659,7 @@
       width: 20px;
       height: 20px;
       border-radius: 50%;
-      background: #ff6bर्क35;
+      background: #ff6b35;
       cursor: pointer;
       box-shadow: 0 0 8px rgba(255,107,53,0.6);
     }
@@ -665,7 +717,8 @@
       .volume-value { font-size: 3.5vw; }
       .logo, .control-panel, .freq { font-size: 3.5vw !important; }
       .station-item { font-size: 2.5vw !important; min-width: 80px; }
-      .station-marker { top: -24px; width: 12px; height: 12px; }
+      .station-item.active { font-size: 3.2vw !important; }
+      .station-marker { top: -28px; width: 14px; height: 14px; }
       .top-controls { gap: 10px; }
       #powerBtn { width: 60px; height: 36px; font-size: 10px; }
       #powerBtn::before { width: 24px; height: 24px; top: 4px; left: 4px; }
@@ -697,13 +750,11 @@
 
     <!-- TOP CONTROLS -->
     <div class="top-controls">
-      <!-- ON/OFF DESPLEGABLE -->
       <button id="powerBtn" onclick="togglePower()">
         <div class="power-label off-label">OFF</div>
         <div class="power-label on-label">ON</div>
       </button>
 
-      <!-- ESTACIONES: HAMBURGUESA -->
       <div class="stations-btn" id="stationsBtn">
         <div class="hamburger">
           <span></span>
@@ -736,7 +787,6 @@
         <button class="control-btn" id="themeBtn" onclick="toggleTheme()">Sun</button>
       </div>
 
-      <!-- VOLUMEN -->
       <div class="volume-container">
         <button class="volume-btn" onclick="changeVolume(-10)">-</button>
         <input type="range" class="volume-slider" id="volumeSlider" min="0" max="100" value="50" oninput="setVolume(this.value)">
@@ -804,14 +854,27 @@
     const stationMarker = document.getElementById('stationMarker');
     const playbackIndicator = document.getElementById('playbackIndicator');
 
-    // Guardar/recuperar índice
-    function saveStation() {
-      localStorage.setItem('lastStationIndex', currentIndex);
+    // Persistencia
+    function saveState() {
+      const state = {
+        currentIndex,
+        isDark,
+        isPowered,
+        isPlaying,
+        volume,
+        isMuted
+      };
+      localStorage.setItem('cradioState', JSON.stringify(state));
     }
 
-    function loadStation() {
-      const saved = localStorage.getItem('lastStationIndex');
-      return saved !== null ? parseInt(saved) : 0;
+    function loadState() {
+      const saved = localStorage.getItem('cradioState');
+      if (!saved) return null;
+      try {
+        return JSON.parse(saved);
+      } catch (e) {
+        return null;
+      }
     }
 
     // Cargar estaciones
@@ -900,7 +963,7 @@
       if (!isPowered) return;
 
       currentIndex = index;
-      saveStation();
+      saveState();
       const station = stationsList[currentIndex];
       audio.src = station.url;
       audio.load();
@@ -942,6 +1005,7 @@
         playbackIndicator.classList.add('paused');
         audio.pause();
       }
+      saveState();
     }
 
     // Power
@@ -972,6 +1036,7 @@
         playbackIndicator.classList.add('paused');
         audio.pause();
       }
+      saveState();
     }
 
     // Mute
@@ -982,6 +1047,7 @@
       const btn = document.getElementById('muteBtn');
       btn.textContent = isMuted ? 'Muted Speaker' : 'Speaker';
       document.getElementById('volumeLevel').textContent = isMuted ? 'MUTE' : volume;
+      saveState();
     }
 
     // Volumen
@@ -991,6 +1057,7 @@
       audio.volume = volume / 100;
       document.getElementById('volumeLevel').textContent = volume;
       document.getElementById('volumeSlider').value = volume;
+      saveState();
     }
 
     function changeVolume(delta) {
@@ -1014,19 +1081,56 @@
         radio.classList.remove('dark');
         btn.textContent = 'Sun';
       }
+      saveState();
     }
 
     // Inicializar
     document.addEventListener('DOMContentLoaded', function() {
       loadAllStations();
       loadMenu();
-      document.getElementById('powerBtn').classList.add('on');
       stationsBtn.addEventListener('click', toggleMenu);
 
-      // Cargar última estación + reproducir automáticamente
-      currentIndex = loadStation();
+      // Cargar estado completo
+      const savedState = loadState();
+      if (savedState) {
+        currentIndex = savedState.currentIndex;
+        isDark = savedState.isDark;
+        isPowered = savedState.isPowered;
+        isPlaying = savedState.isPlaying;
+        volume = savedState.volume;
+        isMuted = savedState.isMuted;
+      }
+
+      // Aplicar tema
+      if (isDark) {
+        document.body.classList.add('dark');
+        document.getElementById('radio').classList.add('dark');
+        document.getElementById('themeBtn').textContent = 'Moon';
+      }
+
+      // Aplicar power
+      const powerBtn = document.getElementById('powerBtn');
+      if (isPowered) {
+        powerBtn.classList.add('on');
+      }
+
+      // Reproducir última estación
       playStation(currentIndex);
-      setVolume(50);
+      setVolume(volume);
+
+      // Aplicar mute
+      if (isMuted) {
+        audio.muted = true;
+        document.getElementById('muteBtn').textContent = 'Muted Speaker';
+        document.getElementById('volumeLevel').textContent = 'MUTE';
+      }
+
+      // Aplicar play/pause
+      if (!isPlaying) {
+        document.getElementById('playPauseBtn').textContent = 'Play';
+        document.getElementById('playStatus').textContent = 'Pausado';
+        playbackIndicator.classList.add('paused');
+      }
 
       // Ajustar al redimensionar
       let resizeTimer;
@@ -1037,6 +1141,9 @@
           updateStationMarker();
         }, 100);
       });
+
+      // Guardar estado en cada cambio
+      window.addEventListener('beforeunload', saveState);
     });
   </script>
 
