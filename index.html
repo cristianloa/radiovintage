@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>CRadio – Búsqueda Real + ON/OFF</title>
+  <title>CRadio – Animación de Reproducción</title>
   <style>
     /* ======================
        GLOBAL & BODY
@@ -22,7 +22,7 @@
       justify-content: center;
       min-height: 100vh;
       font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-      perspective:131200px;
+      perspective: 1200px;
       transition: background 0.5s ease;
       padding: 20px;
     }
@@ -80,7 +80,7 @@
     }
 
     /* ======================
-       RELOJ
+       RELOJ + ANIMACIÓN DE REPRODUCCIÓN
        ====================== */
     .clock-section {
       position: absolute;
@@ -95,6 +95,7 @@
       box-shadow: inset 0 8px 16px rgba(0,0,0,0.2), 0 10px 24px rgba(0,0,0,0.3);
       border: 14px solid #d4af37;
       z-index: 10;
+      overflow: hidden;
     }
 
     .radio.dark .clock-section {
@@ -116,12 +117,68 @@
       color: #333;
       letter-spacing: 2px;
       text-shadow: 0 2px 4px rgba(0,0,0,0.3);
+      z-index: 2;
     }
 
     .radio.dark .clock-face {
       background: #111;
       color: #ff6b35;
       text-shadow: 0 0 12px #ff6b35, 0 0 24px #ff4500, 0 2px 4px #000;
+    }
+
+    /* ESPACIO NEGRO DEBAJO DEL RELOJ */
+    .playback-indicator {
+      position: absolute;
+      bottom: 20%;
+      left: 50%;
+      transform: translateX(-50%);
+      width: 70%;
+      height: 30%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+      z-index: 1;
+    }
+
+    .wave-bar {
+      width: 4px;
+      height: 20px;
+      background: #ff6b35;
+      border-radius: 2px;
+      opacity: 0;
+      transform: scaleY(0.3);
+      animation: wave 1.2s ease-in-out infinite;
+      box-shadow: 0 0 8px #ff6b35;
+    }
+
+    .radio.dark .wave-bar {
+      background: #ff4500;
+      box-shadow: 0 0 12px #ff4500;
+    }
+
+    .wave-bar:nth-child(1) { animation-delay: 0s; }
+    .wave-bar:nth-child(2) { animation-delay: 0.1s; }
+    .wave-bar:nth-child(3) { animation-delay: 0.2s; }
+    .wave-bar:nth-child(4) { animation-delay: 0.3s; }
+    .wave-bar:nth-child(5) { animation-delay: 0.4s; }
+
+    @keyframes wave {
+      0%, 100% {
+        transform: scaleY(0.3);
+        opacity: 0.4;
+      }
+      50% {
+        transform: scaleY(1);
+        opacity: 1;
+      }
+    }
+
+    /* Pausar animación cuando no hay reproducción */
+    .playback-indicator.paused .wave-bar {
+      animation-play-state: paused;
+      opacity: 0.2;
+      transform: scaleY(0.3);
     }
 
     /* ======================
@@ -137,7 +194,7 @@
       z-index: 15;
     }
 
-    /* BOTÓN POWER: ESTILO CLÁSICO + ON/OFF */
+    /* BOTÓN POWER: ON/OFF */
     #powerBtn {
       width: 70px;
       height: 40px;
@@ -337,7 +394,7 @@
     .radio.dark .grill::before { background: #000; }
 
     /* ======================
-       DIAL: CARRUSEL + PUNTERO BUSCANDO
+       DIAL: CARRUSEL + PUNTERO
        ====================== */
     .dial-window {
       position: absolute;
@@ -418,7 +475,6 @@
       background: rgba(255,107,53,0.15);
     }
 
-    /* PUNTERO ROJO: ANIMACIÓN DE BÚSQUEDA */
     .pointer {
       position: absolute;
       top: -32px;
@@ -440,7 +496,6 @@
       filter: drop-shadow(0 0 20px #ff4500);
     }
 
-    /* Animación de búsqueda */
     @keyframes searchPulse {
       0%, 100% { 
         transform: translateX(-50%) scale(1);
@@ -622,6 +677,8 @@
     /* Responsive */
     @media (max-width: 768px) {
       .clock-face { font-size: 5.5vw !important; }
+      .playback-indicator { gap: 4px; }
+      .wave-bar { width: 3px; height: 16px; }
       .control-buttons { gap: 6px; }
       button.control-btn { width: 42px; height: 42px; font-size: 16px; }
       .volume-btn { width: 36px; height: 36px; font-size: 18px; }
@@ -648,12 +705,19 @@
   <div class="radio" id="radio">
     <div class="logo">CRADIO</div>
 
-    <!-- Reloj -->
+    <!-- Reloj + Indicador de reproducción -->
     <div class="clock-section">
       <div class="clock-face" id="clockDisplay">18:00</div>
+      <div class="playback-indicator" id="playbackIndicator">
+        <div class="wave-bar"></div>
+        <div class="wave-bar"></div>
+        <div class="wave-bar"></div>
+        <div class="wave-bar"></div>
+        <div class="wave-bar"></div>
+      </div>
     </div>
 
-    <!-- TOP CONTROLS: POWER + ESTACIONES -->
+    <!-- TOP CONTROLS -->
     <div class="top-controls">
       <button id="powerBtn" onclick="togglePower()">
         <div class="power-label off-label">OFF</div>
@@ -668,7 +732,7 @@
     <!-- Parrilla -->
     <div class="grill"></div>
 
-    <!-- Dial: TODAS LAS ESTACIONES -->
+    <!-- Dial -->
     <div class="dial-window">
       <div class="station-carousel">
         <div class="station-track" id="stationTrack"></div>
@@ -752,8 +816,9 @@
     const dropdownMenu = document.getElementById('dropdownMenu');
     const menuToggle = document.getElementById('menuToggle');
     const pointer = document.getElementById('pointer');
+    const playbackIndicator = document.getElementById('playbackIndicator');
 
-    // Cargar todas las estaciones
+    // Cargar estaciones
     function loadAllStations() {
       stationTrack.innerHTML = '';
       stationsList.forEach((station, i) => {
@@ -767,7 +832,7 @@
       });
     }
 
-    // Centrar estación activa
+    // Centrar estación
     function centerActiveStation() {
       const items = document.querySelectorAll('.station-item');
       const activeItem = items[currentIndex];
@@ -781,7 +846,7 @@
       stationTrack.style.transform = `translateX(${-offset}px)`;
     }
 
-    // Actualizar puntero con animación de búsqueda
+    // Actualizar puntero
     function updatePointer() {
       const activeItem = document.querySelector('.station-item.active');
       const dialWindow = document.querySelector('.dial-window');
@@ -794,7 +859,6 @@
       }
     }
 
-    // Iniciar búsqueda
     function startSearchAnimation() {
       pointer.classList.add('searching');
     }
@@ -815,7 +879,6 @@
       });
     }
 
-    // Menú
     function toggleMenu() {
       dropdownMenu.classList.toggle('show');
     }
@@ -841,19 +904,16 @@
     setInterval(updateClock, 1000);
     updateClock();
 
-    // Reproducir con animación de búsqueda
+    // Reproducir
     function playStation(index) {
       if (!isPowered) return;
 
-      // Iniciar animación de búsqueda
       startSearchAnimation();
-
       currentIndex = index;
       const station = stationsList[currentIndex];
       audio.src = station.url;
       audio.load();
 
-      // Actualizar clases
       document.querySelectorAll('.station-item').forEach((el, i) => {
         el.classList.toggle('active', i === currentIndex);
       });
@@ -861,19 +921,16 @@
         el.classList.toggle('active', i === currentIndex);
       });
 
-      // Centrar y detener animación
       centerActiveStation();
       setTimeout(() => {
         updatePointer();
         if (isPlaying) audio.play().catch(() => {});
       }, 600);
 
-      // Panel
       document.getElementById('currentStation').textContent = station.name;
       document.getElementById('currentFreq').textContent = station.name;
     }
 
-    // Navegación
     function tuneNext() { if (isPowered) { currentIndex = (currentIndex + 1) % stationsList.length; playStation(currentIndex); } }
     function tunePrev() { if (isPowered) { currentIndex = (currentIndex - 1 + stationsList.length) % stationsList.length; playStation(currentIndex); } }
 
@@ -884,8 +941,15 @@
       const btn = document.getElementById('playPauseBtn');
       btn.textContent = isPlaying ? 'Pause' : 'Play';
       document.getElementById('playStatus').textContent = isPlaying ? 'Reproduciendo' : 'Pausado';
-      if (isPlaying) audio.play().catch(() => {});
-      else audio.pause();
+      
+      // Controlar animación de ondas
+      if (isPlaying) {
+        playbackIndicator.classList.remove('paused');
+        audio.play().catch(() => {});
+      } else {
+        playbackIndicator.classList.add('paused');
+        audio.pause();
+      }
     }
 
     // Power
@@ -901,8 +965,9 @@
         status.style.color = '#0f0';
         powerBtn.classList.add('on');
         isPlaying = true;
-        document.getElementById('playPauseBtn').textContent = 'Pause';
+        document,getElementById('playPauseBtn').textContent = 'Pause';
         document.getElementById('playStatus').textContent = 'Reproduciendo';
+        playbackIndicator.classList.remove('paused');
         audio.play().catch(() => {});
       } else {
         radio.style.opacity = '0.3';
@@ -912,6 +977,7 @@
         isPlaying = false;
         document.getElementById('playPauseBtn').textContent = 'Play';
         document.getElementById('playStatus').textContent = 'Apagado';
+        playbackIndicator.classList.add('paused');
         audio.pause();
         pointer.classList.remove('searching');
       }
