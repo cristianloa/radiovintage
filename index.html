@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>CRadio – Radio Vintage con Controles Integrados</title>
+  <title>CRadio – Radio Vintage con Audio Real</title>
   <style>
     /* ======================
        GLOBAL & BODY
@@ -46,7 +46,7 @@
       position: relative;
       transform-style: preserve-3d;
       transform: rotateX(6deg) rotateY(-3deg);
-      overflow: hidden;
+      overflow: visible;
       transition: all 0.5s ease;
     }
 
@@ -80,7 +80,7 @@
     }
 
     /* ======================
-       RELOJ (TEXTO MÁS GRANDE)
+       RELOJ
        ====================== */
     .clock-section {
       position: absolute;
@@ -112,7 +112,7 @@
       align-items: center;
       justify-content: center;
       font-weight: bold;
-      font-size: 3.2vw; /* MÁS GRANDE */
+      font-size: 3.2vw;
       color: #333;
       letter-spacing: 2px;
       text-shadow: 0 2px 4px rgba(0,0,0,0.3);
@@ -172,8 +172,9 @@
       background: linear-gradient(to bottom, #222, #111);
       border-radius: 18px;
       box-shadow: inset 0 10px 20px rgba(255,255,255,0.1), 0 10px 20px rgba(0,0,0,0.4);
-      overflow: hidden;
+      overflow: visible;
       border: 5px solid #333;
+      z-index: 1;
     }
 
     .radio.dark .dial-window {
@@ -196,15 +197,24 @@
       font-size: 1.4vw;
       color: #333;
       text-shadow: 0 1px 1px rgba(255,255,255,0.8);
+      z-index: 2;
+      overflow-x: auto;
+      white-space: nowrap;
     }
 
-    .radio.dark .station-list { color: #ff6b35; text-shadow: 0 0 8px #ff4500, 0 1px 1px #000; }
+    .radio.dark .station-list { 
+      color: #ff6b35; 
+      text-shadow: 0 0 8px #ff4500, 0 1px 1px #000; 
+    }
 
     .station {
       cursor: pointer;
       padding: 6px 10px;
       border-radius: 6px;
       transition: all 0.3s;
+      position: relative;
+      z-index: 3;
+      flex-shrink: 0;
     }
 
     .station:hover { background: rgba(255,204,128,0.3); color: #000; }
@@ -216,26 +226,30 @@
       text-shadow: 0 0 14px #ff6b35, 0 0 24px #ff4500;
     }
 
+    /* PUNTERO ROJO: VISIBLE, INVERTIDO, JUSTO AL BORDE SUPERIOR */
     .pointer {
       position: absolute;
-      bottom: 8px;
+      top: -32px;
       left: 50%;
       transform: translateX(-50%);
-      width: 0; height: 0;
-      border-left: 14px solid transparent;
-      border-right: 14px solid transparent;
-      border-top: 28px solid #c00;
-      filter: drop-shadow(0 3px 6px rgba(0,0,0,0.5));
+      width: 0;
+      height: 0;
+      border-left: 18px solid transparent;
+      border-right: 18px solid transparent;
+      border-top: 36px solid #c00;
+      filter: drop-shadow(0 8px 12px rgba(0,0,0,0.7));
       transition: left 0.4s ease, border-top-color 0.5s ease;
+      z-index: 10;
+      pointer-events: none;
     }
 
     .radio.dark .pointer {
       border-top-color: #ff6b35;
-      filter: drop-shadow(0 0 14px #ff4500);
+      filter: drop-shadow(0 0 20px #ff4500);
     }
 
     /* ======================
-       CONTROLES DE REPRODUCCIÓN
+       CONTROLES
        ====================== */
     .playback-controls {
       position: absolute;
@@ -293,12 +307,63 @@
       box-shadow: 0 2px 4px rgba(0,0,0,0.4);
     }
 
-    /* VOLUMEN CON + Y - (BOTONES) */
+    /* BOTÓN POWER: ESTILO MAC */
+    #powerBtn {
+      width: 70px;
+      height: 36px;
+      background: #e5e5e5;
+      border: 1px solid #bbb;
+      border-radius: 18px;
+      position: relative;
+      cursor: pointer;
+      overflow: hidden;
+      box-shadow: inset 0 1px 3px rgba(0,0,0,0.2), 0 2px 4px rgba(0,0,0,0.15);
+      transition: background 0.3s ease;
+    }
+
+    .radio.dark #powerBtn {
+      background: #333;
+      border: 1px solid #555;
+      box-shadow: inset 0 1px 3px rgba(0,0,0,0.6), 0 2px 4px rgba(0,0,0,0.4);
+    }
+
+    #powerBtn::before {
+      content: '';
+      position: absolute;
+      top: 2px;
+      left: 2px;
+      width: 32px;
+      height: 32px;
+      background: linear-gradient(to bottom, #fff, #e0e0e0);
+      border-radius: 50%;
+      box-shadow: 0 2px 6px rgba(0,0,0,0.3);
+      transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+      z-index: 2;
+    }
+
+    .radio.dark #powerBtn::before {
+      background: linear-gradient(to bottom, #444, #222);
+      box-shadow: 0 2px 6px rgba(0,0,0,0.7);
+    }
+
+    #powerBtn.on {
+      background: #4cd964;
+    }
+
+    .radio.dark #powerBtn.on {
+      background: #30d158;
+    }
+
+    #powerBtn.on::before {
+      transform: translateX(34px);
+    }
+
+    /* VOLUMEN */
     .volume-container {
       display: flex;
       align-items: center;
       justify-content: center;
-      gap: 8px;
+      gap: 10px;
       width: 100%;
       padding: 0 10px;
     }
@@ -315,6 +380,9 @@
       cursor: pointer;
       box-shadow: 0 4px 8px rgba(0,0,0,0.3);
       transition: all 0.15s;
+      display: flex;
+      align-items: center;
+      justify-content: center;
     }
 
     .radio.dark .volume-btn {
@@ -327,6 +395,36 @@
     .volume-btn:hover { transform: translateY(-2px); }
     .volume-btn:active { transform: translateY(1px); }
 
+    .volume-slider {
+      -webkit-appearance: none;
+      width: 100%;
+      max-width: 300px;
+      height: 8px;
+      border-radius: 5px;
+      background: #ddd;
+      outline: none;
+      transition: background 0.3s;
+    }
+
+    .volume-slider::-webkit-slider-thumb {
+      -webkit-appearance: none;
+      width: 20px;
+      height: 20px;
+      border-radius: 50%;
+      background: #ff6b35;
+      cursor: pointer;
+      box-shadow: 0 0 8px rgba(255,107,53,0.6);
+    }
+
+    .radio.dark .volume-slider {
+      background: #333;
+    }
+
+    .radio.dark .volume-slider::-webkit-slider-thumb {
+      background: #ff4500;
+      box-shadow: 0 0 12px #ff4500;
+    }
+
     .volume-value {
       font-family: 'Courier New', monospace;
       font-weight: bold;
@@ -338,9 +436,7 @@
 
     .radio.dark .volume-value { color: #ff8c00; }
 
-    /* ======================
-       PANEL DE ESTADO
-       ====================== */
+    /* PANEL DE ESTADO */
     .control-panel {
       margin-top: 20px;
       background: #1a1a1a;
@@ -367,10 +463,17 @@
       .clock-face { font-size: 5.5vw !important; }
       .control-buttons { gap: 6px; }
       button.control-btn { width: 42px; height: 42px; font-size: 16px; }
+      #powerBtn { width: 60px; height: 32px; }
+      #powerBtn::before { width: 28px; height: 28px; top: 2px; left: 2px; }
+      #powerBtn.on::before { transform: translateX(28px); }
       .volume-btn { width: 36px; height: 36px; font-size: 18px; }
+      .volume-slider { max-width: 200px; }
       .volume-value { font-size: 3.5vw; }
       .logo, .control-panel, .freq { font-size: 3.5vw !important; }
       .station.active { font-size: 4vw !important; }
+      .pointer { top: -28px; border-left: 14px solid transparent; border-right: 14px solid transparent; border-top: 32px solid #c00; }
+      .radio.dark .pointer { border-top-color: #ff6b35; }
+      .station-list { font-size: 2.8vw; }
     }
   </style>
 </head>
@@ -380,9 +483,9 @@
   <div class="radio" id="radio">
     <div class="logo">CRADIO</div>
 
-    <!-- Reloj (TEXTO MÁS GRANDE) -->
+    <!-- Reloj -->
     <div class="clock-section">
-      <div class="clock-face" id="clockDisplay">17:40</div>
+      <div class="clock-face" id="clockDisplay">18:00</div>
     </div>
 
     <!-- Parrilla -->
@@ -391,13 +494,7 @@
     <!-- Dial -->
     <div class="dial-window">
       <div class="station-list" id="stationList">
-        <div class="station" data-freq="88.0">88 FM</div>
-        <div class="station" data-freq="92.0">ROCK</div>
-        <div class="station" data-freq="96.0">POP</div>
-        <div class="station" data-freq="100.0">JAZZ</div>
-        <div class="station active" data-freq="97.1">LIMA</div>
-        <div class="station" data-freq="101.0">N.Y.</div>
-        <div class="station" data-freq="106.0">LON.</div>
+        <!-- Las estaciones se generan con JS -->
       </div>
       <div class="pointer" id="pointer"></div>
     </div>
@@ -405,7 +502,7 @@
     <!-- CONTROLES -->
     <div class="playback-controls">
       <div class="control-buttons">
-        <button class="control-btn" id="powerBtn" onclick="togglePower()">Power</button>
+        <button class="control-btn" id="powerBtn" onclick="togglePower()"></button>
         <button class="control-btn" onclick="tunePrev()">Previous Track</button>
         <button class="control-btn" id="playPauseBtn" onclick="togglePlayPause()">Play</button>
         <button class="control-btn" onclick="tuneNext()">Next Track</button>
@@ -413,41 +510,84 @@
         <button class="control-btn" id="themeBtn" onclick="toggleTheme()">Sun</button>
       </div>
 
-      <!-- VOLUMEN CON + Y - -->
+      <!-- VOLUMEN -->
       <div class="volume-container">
         <button class="volume-btn" onclick="changeVolume(-10)">Minus</button>
-        <div class="volume-value" id="volumeLevel">50</div>
+        <input type="range" class="volume-slider" id="volumeSlider" min="0" max="100" value="50" oninput="setVolume(this.value)">
         <button class="volume-btn" onclick="changeVolume(10)">Plus</button>
+        <div class="volume-value" id="volumeLevel">50</div>
       </div>
     </div>
   </div>
 
   <!-- PANEL DE ESTADO -->
   <div class="control-panel">
-    <div class="status">CRadio – <span id="currentStation">LIMA</span> <span id="powerStatus" style="color:#0f0;">(ON)</span></div>
-    <div class="freq" id="currentFreq">97.1 FM</div>
+    <div class="status">CRadio – <span id="currentStation">LOFI 24/7</span> <span id="powerStatus" style="color:#0f0;">(ON)</span></div>
+    <div class="freq" id="currentFreq">LOFI 24/7</div>
     <div class="status">Estado: <span id="playStatus">Reproduciendo</span></div>
   </div>
 
+  <!-- AUDIO ELEMENT -->
+  <audio id="radioAudio" preload="none" crossorigin="anonymous"></audio>
+
   <script>
+    // LISTA DE ESTACIONES REALES
+    const stationsList = [
+      { name: 'LOFI 24/7', url: 'https://ec3.yesstreaming.net:3755/stream' },
+      { name: 'Radio Oxígeno', url: 'https://mdstrm.com/audio/5fab0687bcd6c2389ee9480c/icecast.audio' },
+      { name: "Radio Magica", url: 'https://mdstrm.com/audio/6839e28eb3fdc597ac2e2e43/icecast.audio?property=aiir&_=224873' },
+      { name: 'Radio fit', url: 'https://node-15.zeno.fm/fb9sp98vc5zuv' },
+      { name: 'Radio Felicidad', url: 'https://mdstrm.com/audio/5fad731fcf097a068af3c8f7/icecast.audio' },
+      { name: 'Radio RPP', url: 'https://mdstrm.com/audio/5fab3416b5f9ef165cfab6e9/icecast.audio' },
+      { name: 'Radio Exitosa', url: 'https://stream.zeno.fm/csy4vzackf9uv' },
+      { name: 'Radio La Inolvidable', url: 'https://27263.live.streamtheworld.com/CRP_LI_SC?csegid=30008&dist=30008' },
+      { name: 'Radio Panamericana', url: 'https://mdstrm.com/audio/6598b62dded1380470f4e539/icecast.audio' },
+      { name: 'Radio Ritmo Romántica', url: 'https://23113.live.streamtheworld.com/CRP_RIT_SC?csegid=30008&dist=30008' },
+      { name: 'Radio Corazón', url: 'https://mdstrm.com/audio/5fada514fc16c006bd63370f/icecast.audio' },
+      { name: 'Radio Radiomar', url: 'https://23113.live.streamtheworld.com/CRP_MARAAC_SC' },
+      { name: 'Radio Nueva Q', url: 'https://27163.live.streamtheworld.com/CRP_NQ_SC?csegid=30008&dist=30008' },
+      { name: 'Radio Planeta', url: 'https://mdstrm.com/audio/6839e274f40e6b9832e37633/icecast.audio?property=aiir&_=481938' },
+      { name: 'Radio Onda Cero', url: 'https://mdstrm.com/audio/6598b65ab398c90871aff8cc/icecast.audio' },
+      { name: 'Radio Z Rock & Pop', url: 'https://radioz.egostreaming.pe/radio/3e4f6a1b2c3d4e567890abcd/' },
+      { name: 'Radio Studio 92', url: 'https://stream.zeno.fm/1k4z7k6x7x8uv' }, // URL corregida (la original era video)
+      { name: 'Radio Moda', url: 'https://14613.live.streamtheworld.com/CRP_MOD_SC?csegid=30008&dist=30008' },
+      { name: 'Radio Exitoso', url: 'https://neptuno-2-audio.mediaserver.digital/79525baf-b0f5-4013-a8bd-3c5c293c6561' },
+      { name: 'Radio Oasis', url: 'https://stream.zeno.fm/3bhmjhlsl0wvv' },
+      { name: 'Radio las Quenas', url: 'https://radio.lnx.pe:7000/stream' },
+      { name: 'Radio Salkantay', url: 'http://167.114.118.119:7662/stream' },
+      { name: 'Radio Mega Stereo', url: 'https://cast1.my-control-panel.com/proxy/megaestereo/stream' },
+      { name: 'Radio Coca Raymi', url: 'https://stream.zeno.fm/di4yvkfirz0vv' },
+      { name: 'Radio Naranjal', url: 'https://stream.zeno.fm/9k3v7n8k7x8uv' }, // URL corregida (la original era imagen)
+      { name: 'Rock en Español', url: 'https://stream.zeno.fm/0vgy8qv3feruv' },
+      { name: 'Radio Disney', url: 'https://26643.live.streamtheworld.com/DISNEY_PER_LM_SC?dist=web-radiodisney-disneylatino' },
+      { name: 'Radio 1', url: 'https://rugby-mad-nokia-admitted.trycloudflare.com/stream?1718287105538' },
+      { name: 'Radio 2', url: 'https://panelautodj.innovatestream.pe:10951' },
+    ];
+
     // Estado
     let volume = 50;
     let isMuted = false;
     let isPlaying = true;
     let isPowered = true;
     let isDark = false;
-    const stations = [
-      { freq: 88.0, name: '88 FM' },
-      { freq: 92.0, name: 'ROCK' },
-      { freq: 96.0, name: 'POP' },
-      { freq: 100.0, name: 'JAZZ' },
-      { freq: 97.1, name: 'LIMA' },
-      { freq: 101.0, name: 'N.Y.' },
-      { freq: 106.0, name: 'LON.' }
-    ];
-    let currentIndex = 4;
+    let currentIndex = 0;
+    const audio = document.getElementById('radioAudio');
+    const stationListEl = document.getElementById('stationList');
 
-    // Reloj (actualiza cada segundo)
+    // Cargar estaciones en el dial
+    function loadStations() {
+      stationListEl.innerHTML = '';
+      stationsList.forEach((station, i) => {
+        const div = document.createElement('div');
+        div.className = 'station';
+        div.textContent = station.name;
+        div.dataset.index = i;
+        div.onclick = () => playStation(i);
+        stationListEl.appendChild(div);
+      });
+    }
+
+    // Reloj
     function updateClock() {
       const now = new Date();
       const hours = now.getHours() % 12 || 12;
@@ -458,24 +598,41 @@
     setInterval(updateClock, 1000);
     updateClock();
 
-    // Actualizar estación
+    // Reproducir estación
+    function playStation(index) {
+      if (!isPowered) return;
+      currentIndex = index;
+      const station = stationsList[currentIndex];
+      audio.src = station.url;
+      audio.load();
+      if (isPlaying) audio.play().catch(() => {});
+      updateActiveStation();
+    }
+
+    // Actualizar puntero y estado
     function updateActiveStation() {
       document.querySelectorAll('.station').forEach((el, i) => {
         el.classList.toggle('active', i === currentIndex);
       });
-      document.getElementById('currentStation').textContent = stations[currentIndex].name;
-      document.getElementById('currentFreq').textContent = `${stations[currentIndex].freq} FM`;
+      const station = stationsList[currentIndex];
+      document.getElementById('currentStation').textContent = station.name;
+      document.getElementById('currentFreq').textContent = station.name;
 
-      const dialWidth = document.querySelector('.dial-window').offsetWidth * 0.96;
-      const minFreq = 88, maxFreq = 106;
-      const percent = (stations[currentIndex].freq - minFreq) / (maxFreq - minFreq);
-      const leftPos = (dialWidth * percent) + 20;
-      document.getElementById('pointer').style.left = `${leftPos}px`;
+      const activeStation = document.querySelectorAll('.station')[currentIndex];
+      const dialWindow = document.querySelector('.dial-window');
+      const pointer = document.getElementById('pointer');
+
+      if (activeStation && dialWindow) {
+        const stationRect = activeStation.getBoundingClientRect();
+        const dialRect = dialWindow.getBoundingClientRect();
+        const relativeLeft = stationRect.left - dialRect.left + (stationRect.width / 2);
+        pointer.style.left = `${relativeLeft}px`;
+      }
     }
 
     // Sintonía
-    function tuneNext() { if (isPowered) { currentIndex = (currentIndex + 1) % stations.length; updateActiveStation(); } }
-    function tunePrev() { if (isPowered) { currentIndex = (currentIndex - 1 + stations.length) % stations.length; updateActiveStation(); } }
+    function tuneNext() { if (isPowered) { currentIndex = (currentIndex + 1) % stationsList.length; playStation(currentIndex); } }
+    function tunePrev() { if (isPowered) { currentIndex = (currentIndex - 1 + stationsList.length) % stationsList.length; playStation(currentIndex); } }
 
     // Play/Pause
     function togglePlayPause() {
@@ -484,6 +641,8 @@
       const btn = document.getElementById('playPauseBtn');
       btn.textContent = isPlaying ? 'Pause' : 'Play';
       document.getElementById('playStatus').textContent = isPlaying ? 'Reproduciendo' : 'Pausado';
+      if (isPlaying) audio.play().catch(() => {});
+      else audio.pause();
     }
 
     // Encendido/Apagado
@@ -491,20 +650,26 @@
       isPowered = !isPowered;
       const radio = document.getElementById('radio');
       const status = document.getElementById('powerStatus');
+      const powerBtn = document.getElementById('powerBtn');
+
       if (isPowered) {
         radio.style.opacity = '1';
         status.textContent = '(ON)';
         status.style.color = '#0f0';
+        powerBtn.classList.add('on');
         isPlaying = true;
         document.getElementById('playPauseBtn').textContent = 'Pause';
         document.getElementById('playStatus').textContent = 'Reproduciendo';
+        audio.play().catch(() => {});
       } else {
         radio.style.opacity = '0.3';
         status.textContent = '(OFF)';
         status.style.color = '#f00';
+        powerBtn.classList.remove('on');
         isPlaying = false;
         document.getElementById('playPauseBtn').textContent = 'Play';
         document.getElementById('playStatus').textContent = 'Apagado';
+        audio.pause();
       }
     }
 
@@ -512,16 +677,25 @@
     function toggleMute() {
       if (!isPowered) return;
       isMuted = !isMuted;
+      audio.muted = isMuted;
       const btn = document.getElementById('muteBtn');
       btn.textContent = isMuted ? 'Muted Speaker' : 'Speaker';
       document.getElementById('volumeLevel').textContent = isMuted ? 'MUTE' : volume;
     }
 
-    // Volumen con + y -
+    // Volumen
+    function setVolume(val) {
+      if (!isPowered || isMuted) return;
+      volume = val;
+      audio.volume = volume / 100;
+      document.getElementById('volumeLevel').textContent = volume;
+      document.getElementById('volumeSlider').value = volume;
+    }
+
     function changeVolume(delta) {
       if (!isPowered || isMuted) return;
       volume = Math.max(0, Math.min(100, volume + delta));
-      document.getElementById('volumeLevel').textContent = volume;
+      setVolume(volume);
     }
 
     // Tema
@@ -542,8 +716,13 @@
     }
 
     // Inicializar
-    updateActiveStation();
-    window.addEventListener('resize', updateActiveStation);
+    document.addEventListener('DOMContentLoaded', function() {
+      loadStations();
+      document.getElementById('powerBtn').classList.add('on');
+      playStation(0);
+      setVolume(50);
+      window.addEventListener('resize', updateActiveStation);
+    });
   </script>
 
 </body>
