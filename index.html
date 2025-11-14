@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>CRadio – Estado Persistente + Animación + Marcador Fijo</title>
+  <title>CRadio – Carrusel Circular + Marcador Triángulo</title>
   <style>
     /* ======================
        GLOBAL & BODY
@@ -80,7 +80,7 @@
     }
 
     /* ======================
-       RELOJ + ANIMACIÓN DE REPRODUCCIÓN
+       RELOJ
        ====================== */
     .clock-section {
       position: absolute;
@@ -126,59 +126,6 @@
       text-shadow: 0 0 12px #ff6b35, 0 0 24px #ff4500, 0 2px 4px #000;
     }
 
-    .playback-indicator {
-      position: absolute;
-      bottom: 20%;
-      left: 50%;
-      transform: translateX(-50%);
-      width: 70%;
-      height: 30%;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      gap: 8px;
-      z-index: 1;
-    }
-
-    .wave-bar {
-      width: 4px;
-      height: 20px;
-      background: #ff6b35;
-      border-radius: 2px;
-      opacity: 0;
-      transform: scaleY(0.3);
-      animation: wave 1.2s ease-in-out infinite;
-      box-shadow: 0 0 8px #ff6b35;
-    }
-
-    .radio.dark .wave-bar {
-      background: #ff4500;
-      box-shadow: 0 0 12px #ff4500;
-    }
-
-    .wave-bar:nth-child(1) { animation-delay: 0s; }
-    .wave-bar:nth-child(2) { animation-delay: 0.1s; }
-    .wave-bar:nth-child(3) { animation-delay: 0.2s; }
-    .wave-bar:nth-child(4) { animation-delay: 0.3s; }
-    .wave-bar:nth-child(5) { animation-delay: 0.4s; }
-
-    @keyframes wave {
-      0%, 100% {
-        transform: scaleY(0.3);
-        opacity: 0.4;
-      }
-      50% {
-        transform: scaleY(1);
-        opacity: 1;
-      }
-    }
-
-    .playback-indicator.paused .wave-bar {
-      animation-play-state: paused;
-      opacity: 0.2;
-      transform: scaleY(0.3);
-    }
-
     /* ======================
        TOP CONTROLS
        ====================== */
@@ -192,7 +139,6 @@
       z-index: 15;
     }
 
-    /* ON/OFF DESPLEGABLE */
     #powerBtn {
       width: 70px;
       height: 40px;
@@ -265,7 +211,6 @@
     #powerBtn.on .on-label { opacity: 1; }
     #powerBtn.on::before { transform: translateX(34px); }
 
-    /* ESTACIONES: HAMBURGUESA */
     .stations-btn {
       display: flex;
       flex-direction: column;
@@ -378,7 +323,7 @@
     }
 
     /* ======================
-       PARRILLA
+       PARRILLA + PLAYBACK INDICATOR DENTRO
        ====================== */
     .grill {
       position: absolute;
@@ -393,6 +338,8 @@
       border-radius: 22px;
       box-shadow: inset 0 0 24px rgba(0,0,0,0.3), 0 8px 16px rgba(0,0,0,0.2);
       overflow: hidden;
+      position: relative;
+      z-index: 5;
     }
 
     .radio.dark .grill {
@@ -406,12 +353,66 @@
       inset: 14px;
       background: #111;
       border-radius: 14px;
+      z-index: 1;
     }
 
     .radio.dark .grill::before { background: #000; }
 
+    .playback-indicator {
+      position: absolute;
+      bottom: 18px;
+      left: 50%;
+      transform: translateX(-50%);
+      width: 70%;
+      height: 24px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 6px;
+      z-index: 2;
+    }
+
+    .wave-bar {
+      width: 3px;
+      height: 16px;
+      background: #ff6b35;
+      border-radius: 2px;
+      opacity: 0;
+      transform: scaleY(0.3);
+      animation: wave 1.2s ease-in-out infinite;
+      box-shadow: 0 0 6px #ff6b35;
+    }
+
+    .radio.dark .wave-bar {
+      background: #ff4500;
+      box-shadow: 0 0 10px #ff4500;
+    }
+
+    .wave-bar:nth-child(1) { animation-delay: 0s; }
+    .wave-bar:nth-child(2) { animation-delay: 0.1s; }
+    .wave-bar:nth-child(3) { animation-delay: 0.2s; }
+    .wave-bar:nth-child(4) { animation-delay: 0.3s; }
+    .wave-bar:nth-child(5) { animation-delay: 0.4s; }
+
+    @keyframes wave {
+      0%, 100% {
+        transform: scaleY(0.3);
+        opacity: 0.4;
+      }
+      50% {
+        transform: scaleY(1);
+        opacity: 1;
+      }
+    }
+
+    .playback-indicator.paused .wave-bar {
+      animation-play-state: paused;
+      opacity: 0.2;
+      transform: scaleY(0.3);
+    }
+
     /* ======================
-       DIAL + MARCADOR FIJO
+       CARRUSEL CIRCULAR + MARCADOR TRIÁNGULO
        ====================== */
     .dial-window {
       position: absolute;
@@ -431,6 +432,7 @@
       display: flex;
       align-items: center;
       padding: 0 10px;
+      perspective: 1000px;
     }
 
     .radio.dark .dial-window {
@@ -439,11 +441,13 @@
     }
 
     .station-carousel {
-      display: flex;
-      align-items: center;
       width: 100%;
       overflow: hidden;
       position: relative;
+      height: 100%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
     }
 
     .station-track {
@@ -451,6 +455,9 @@
       transition: transform 0.6s cubic-bezier(0.4, 0, 0.2, 1);
       gap: 12px;
       padding: 0 20px;
+      height: 100%;
+      align-items: center;
+      will-change: transform;
     }
 
     .station-item {
@@ -469,14 +476,19 @@
       overflow: hidden;
       text-overflow: ellipsis;
       position: relative;
+      transform: scale(0.85);
+      opacity: 0.6;
+      z-index: 1;
     }
 
     .radio.dark .station-item {
       color: #ff8c00;
     }
 
-    /* ANIMACIÓN EN ESTACIÓN ACTIVA */
-    .station-item.active {
+    /* ESTACIÓN CENTRADA */
+    .station-item.center {
+      transform: scale(1.2);
+      opacity: 1;
       color: #fff;
       font-size: 1.5vw;
       text-shadow: 
@@ -485,8 +497,7 @@
         0 0 24px #ff4500,
         0 0 32px #ff4500;
       background: rgba(255,107,53,0.3);
-      transform: scale(1.1);
-      z-index: 2;
+      z-index: 3;
       animation: pulseGlow 1.5s ease-in-out infinite alternate;
     }
 
@@ -497,7 +508,7 @@
           0 0 16px #ff4500,
           0 0 24px #ff4500,
           0 0 32px #ff4500;
-        transform: scale(1.1);
+        transform: scale(1.2);
       }
       100% {
         text-shadow: 
@@ -505,33 +516,42 @@
           0 0 24px #ff4500,
           0 0 36px #ff4500,
           0 0 48px #ff4500;
-        transform: scale(1.15);
+        transform: scale(1.25);
       }
     }
 
-    .station-item:hover:not(.active) {
-      color: #fff;
-      background: rgba(255,255,255,0.1);
+    /* ESTACIONES LATERALES */
+    .station-item.adjacent {
+      transform: scale(1);
+      opacity: 0.8;
+      z-index: 2;
     }
 
-    .radio.dark .station-item:hover:not(.active) {
-      background: rgba(255,107,53,0.15);
+    .station-item.far {
+      transform: scale(0.7);
+      opacity: 0.3;
+      z-index: 1;
     }
 
-    /* MARCADOR FIJO */
+    .station-item:hover:not(.center) {
+      opacity: 0.9;
+      transform: scale(0.95);
+    }
+
+    /* MARCADOR TRIÁNGULO INVERTIDO */
     .station-marker {
       position: absolute;
       top: -32px;
       left: 50%;
       transform: translateX(-50%);
-      width: 16px;
-      height: 16px;
-      background: #c00;
-      border-radius: 50%;
+      width: 0;
+      height: 0;
+      border-left: 16px solid transparent;
+      border-right: 16px solid transparent;
+      border-top: 20px solid #c00;
       box-shadow: 
         0 0 16px #c00,
         0 0 24px #c00,
-        0 0 32px #c00,
         0 4px 8px rgba(0,0,0,0.6);
       z-index: 10;
       pointer-events: none;
@@ -539,11 +559,10 @@
     }
 
     .radio.dark .station-marker {
-      background: #ff6b35;
+      border-top-color: #ff6b35;
       box-shadow: 
         0 0 20px #ff4500,
         0 0 30px #ff4500,
-        0 0 40px #ff4500,
         0 4px 12px rgba(0,0,0,0.8);
     }
 
@@ -578,7 +597,8 @@
       background: radial-gradient(circle at 30% 30%, #f0f0f0, #d0d0d0);
       border: 4px solid #999;
       border-radius: 50%;
-      font-size: 20px;
+      font-size: 18px;
+      font-weight: bold;
       color: #333;
       cursor: pointer;
       box-shadow: 0 8px 16px rgba(0,0,0,0.3), inset 0 2px 4px rgba(255,255,255,0.8);
@@ -586,7 +606,9 @@
       display: flex;
       align-items: center;
       justify-content: center;
-      font-family: 'Segoe UI Emoji', sans-serif;
+      font-family: 'Courier New', monospace;
+      text-transform: uppercase;
+      letter-spacing: 1px;
     }
 
     .radio.dark button.control-btn {
@@ -606,7 +628,6 @@
       box-shadow: 0 4px 8px rgba(0,0,0,0.4);
     }
 
-    /* VOLUMEN */
     .volume-container {
       display: flex;
       align-items: center;
@@ -631,6 +652,7 @@
       display: flex;
       align-items: center;
       justify-content: center;
+      font-family: 'Courier New', monospace;
     }
 
     .radio.dark .volume-btn {
@@ -684,7 +706,6 @@
 
     .radio.dark .volume-value { color: #ff8c00; }
 
-    /* PANEL DE ESTADO */
     .control-panel {
       margin-top: 20px;
       background: #1a1a1a;
@@ -709,16 +730,16 @@
     @media (max-width: 768px) {
       .clock-face { font-size: 5.5vw !important; }
       .playback-indicator { gap: 4px; }
-      .wave-bar { width: 3px; height: 16px; }
+      .wave-bar { width: 2px; height: 12px; }
       .control-buttons { gap: 6px; }
-      button.control-btn { width: 50px; height: 50px; font-size: 18px; }
+      button.control-btn { width: 50px; height: 50px; font-size: 16px; }
       .volume-btn { width: 40px; height: 40px; font-size: 18px; }
       .volume-slider { max-width: 200px; }
       .volume-value { font-size: 3.5vw; }
       .logo, .control-panel, .freq { font-size: 3.5vw !important; }
       .station-item { font-size: 2.5vw !important; min-width: 80px; }
-      .station-item.active { font-size: 3.2vw !important; }
-      .station-marker { top: -28px; width: 14px; height: 14px; }
+      .station-item.center { font-size: 3.2vw !important; }
+      .station-marker { top: -28px; border-left: 14px solid transparent; border-right: 14px solid transparent; border-top: 18px solid #c00; }
       .top-controls { gap: 10px; }
       #powerBtn { width: 60px; height: 36px; font-size: 10px; }
       #powerBtn::before { width: 24px; height: 24px; top: 4px; left: 4px; }
@@ -736,16 +757,9 @@
   <div class="radio" id="radio">
     <div class="logo">CRADIO</div>
 
-    <!-- Reloj + Indicador de reproducción -->
+    <!-- Reloj -->
     <div class="clock-section">
       <div class="clock-face" id="clockDisplay">18:00</div>
-      <div class="playback-indicator" id="playbackIndicator">
-        <div class="wave-bar"></div>
-        <div class="wave-bar"></div>
-        <div class="wave-bar"></div>
-        <div class="wave-bar"></div>
-        <div class="wave-bar"></div>
-      </div>
     </div>
 
     <!-- TOP CONTROLS -->
@@ -766,10 +780,18 @@
       <div class="dropdown-menu" id="dropdownMenu"></div>
     </div>
 
-    <!-- Parrilla -->
-    <div class="grill"></div>
+    <!-- Parrilla con Playback Indicator DENTRO -->
+    <div class="grill">
+      <div class="playback-indicator" id="playbackIndicator">
+        <div class="wave-bar"></div>
+        <div class="wave-bar"></div>
+        <div class="wave-bar"></div>
+        <div class="wave-bar"></div>
+        <div class="wave-bar"></div>
+      </div>
+    </div>
 
-    <!-- Dial -->
+    <!-- Dial con Carrusel Circular -->
     <div class="dial-window">
       <div class="station-carousel">
         <div class="station-track" id="stationTrack"></div>
@@ -780,11 +802,11 @@
     <!-- CONTROLES -->
     <div class="playback-controls">
       <div class="control-buttons">
-        <button class="control-btn" onclick="tunePrev()">Previous Track</button>
-        <button class="control-btn" id="playPauseBtn" onclick="togglePlayPause()">Pause</button>
-        <button class="control-btn" onclick="tuneNext()">Next Track</button>
-        <button class="control-btn" id="muteBtn" onclick="toggleMute()">Speaker</button>
-        <button class="control-btn" id="themeBtn" onclick="toggleTheme()">Sun</button>
+        <button class="control-btn" onclick="tunePrev()" title="Previous Track">PRE</button>
+        <button class="control-btn" id="playPauseBtn" onclick="togglePlayPause()" title="Play/Pause">PLA</button>
+        <button class="control-btn" onclick="tuneNext()" title="Next Track">NEX</button>
+        <button class="control-btn" id="muteBtn" onclick="toggleMute()" title="Mute">MUT</button>
+        <button class="control-btn" id="themeBtn" onclick="toggleTheme()" title="Dark/Light">THE</button>
       </div>
 
       <div class="volume-container">
@@ -856,64 +878,73 @@
 
     // Persistencia
     function saveState() {
-      const state = {
-        currentIndex,
-        isDark,
-        isPowered,
-        isPlaying,
-        volume,
-        isMuted
-      };
+      const state = { currentIndex, isDark, isPowered, isPlaying, volume, isMuted };
       localStorage.setItem('cradioState', JSON.stringify(state));
     }
 
     function loadState() {
       const saved = localStorage.getItem('cradioState');
       if (!saved) return null;
-      try {
-        return JSON.parse(saved);
-      } catch (e) {
-        return null;
-      }
+      try { return JSON.parse(saved); } catch (e) { return null; }
     }
 
-    // Cargar estaciones
+    // Cargar estaciones (duplicadas para efecto circular)
     function loadAllStations() {
       stationTrack.innerHTML = '';
-      stationsList.forEach((station, i) => {
+      const total = stationsList.length;
+      const visible = 7; // Mostrar 7 estaciones
+
+      // Duplicar para efecto infinito
+      const extended = [...stationsList, ...stationsList, ...stationsList];
+
+      for (let i = 0; i < extended.length; i++) {
+        const station = extended[i];
         const div = document.createElement('div');
         div.className = 'station-item';
         div.textContent = station.name;
-        div.dataset.index = i;
-        div.onclick = () => playStation(i);
-        if (i === currentIndex) div.classList.add('active');
+        div.dataset.index = i % total;
+        div.onclick = () => playStation(i % total);
         stationTrack.appendChild(div);
-      });
+      }
+
+      // Centrar la estación actual
+      setTimeout(() => centerStation(currentIndex), 100);
     }
 
-    // Centrar estación
-    function centerActiveStation() {
+    // Centrar estación actual
+    function centerStation(index) {
       const items = document.querySelectorAll('.station-item');
-      const activeItem = items[currentIndex];
-      if (!activeItem) return;
+      const total = stationsList.length;
+      const offset = total + index; // Posición en el array extendido
+      const itemWidth = items[0].offsetWidth + 12; // ancho + gap
+      const containerWidth = document.querySelector('.station-carousel').offsetWidth;
+      const centerOffset = (containerWidth - itemWidth) / 2;
 
-      const trackRect = stationTrack.getBoundingClientRect();
-      const itemRect = activeItem.getBoundingClientRect();
-      const dialRect = document.querySelector('.dial-window').getBoundingClientRect();
+      items.forEach((item, i) => {
+        const distance = Math.abs(i - offset);
+        const minDistance = Math.min(distance, extended.length - distance);
 
-      const offset = itemRect.left - dialRect.left - (dialRect.width / 2) + (itemRect.width / 2);
-      stationTrack.style.transform = `translateX(${-offset}px)`;
-    }
+        if (minDistance === 0) {
+          item.className = 'station-item center';
+        } else if (minDistance === 1) {
+          item.className = 'station-item adjacent';
+        } else if (minDistance <= 3) {
+          item.className = 'station-item far';
+        } else {
+          item.className = 'station-item';
+        }
+      });
 
-    // Actualizar marcador
-    function updateStationMarker() {
-      const activeItem = document.querySelector('.station-item.active');
-      const dialWindow = document.querySelector('.dial-window');
-      if (activeItem && dialWindow) {
-        const itemRect = activeItem.getBoundingClientRect();
-        const dialRect = dialWindow.getBoundingClientRect();
-        const relativeLeft = itemRect.left - dialRect.left + (itemRect.width / 2);
-        stationMarker.style.left = `${relativeLeft}px`;
+      const translateX = -offset * itemWidth + centerOffset;
+      stationTrack.style.transform = `translateX(${translateX}px)`;
+
+      // Actualizar marcador
+      const activeItem = items[offset];
+      if (activeItem) {
+        const rect = activeItem.getBoundingClientRect();
+        const dialRect = document.querySelector('.dial-window').getBoundingClientRect();
+        const centerX = rect.left + rect.width / 2 - dialRect.left;
+        stationMarker.style.left = `${centerX}px`;
       }
     }
 
@@ -925,26 +956,16 @@
         div.className = 'menu-item';
         div.textContent = station.name;
         div.dataset.index = i;
-        div.onclick = () => {
-          playStation(i);
-          closeMenu();
-        };
+        div.onclick = () => { playStation(i); closeMenu(); };
         dropdownMenu.appendChild(div);
       });
     }
 
-    function toggleMenu() {
-      dropdownMenu.classList.toggle('show');
-    }
-
-    function closeMenu() {
-      dropdownMenu.classList.remove('show');
-    }
+    function toggleMenu() { dropdownMenu.classList.toggle('show'); }
+    function closeMenu() { dropdownMenu.classList.remove('show'); }
 
     document.addEventListener('click', (e) => {
-      if (!stationsBtn.contains(e.target) && !dropdownMenu.contains(e.target)) {
-        closeMenu();
-      }
+      if (!stationsBtn.contains(e.target) && !dropdownMenu.contains(e.target)) closeMenu();
     });
 
     // Reloj
@@ -961,26 +982,20 @@
     // Reproducir
     function playStation(index) {
       if (!isPowered) return;
-
       currentIndex = index;
       saveState();
       const station = stationsList[currentIndex];
       audio.src = station.url;
       audio.load();
 
-      document.querySelectorAll('.station-item').forEach((el, i) => {
-        el.classList.toggle('active', i === currentIndex);
-      });
       document.querySelectorAll('.menu-item').forEach((el, i) => {
         el.classList.toggle('active', i === currentIndex);
       });
 
-      centerActiveStation();
+      centerStation(currentIndex);
+
       setTimeout(() => {
-        updateStationMarker();
-        if (isPlaying) {
-          audio.play().catch(() => {});
-        }
+        if (isPlaying) audio.play().catch(() => {});
       }, 100);
 
       document.getElementById('currentStation').textContent = station.name;
@@ -995,7 +1010,7 @@
       if (!isPowered) return;
       isPlaying = !isPlaying;
       const btn = document.getElementById('playPauseBtn');
-      btn.textContent = isPlaying ? 'Pause' : 'Play';
+      btn.textContent = isPlaying ? 'PAU' : 'PLA';
       document.getElementById('playStatus').textContent = isPlaying ? 'Reproduciendo' : 'Pausado';
       
       if (isPlaying) {
@@ -1021,7 +1036,7 @@
         status.style.color = '#0f0';
         powerBtn.classList.add('on');
         isPlaying = true;
-        document.getElementById('playPauseBtn').textContent = 'Pause';
+        document.getElementById('playPauseBtn').textContent = 'PAU';
         document.getElementById('playStatus').textContent = 'Reproduciendo';
         playbackIndicator.classList.remove('paused');
         audio.play().catch(() => {});
@@ -1031,7 +1046,7 @@
         status.style.color = '#f00';
         powerBtn.classList.remove('on');
         isPlaying = false;
-        document.getElementById('playPauseBtn').textContent = 'Play';
+        document.getElementById('playPauseBtn').textContent = 'PLA';
         document.getElementById('playStatus').textContent = 'Apagado';
         playbackIndicator.classList.add('paused');
         audio.pause();
@@ -1045,7 +1060,7 @@
       isMuted = !isMuted;
       audio.muted = isMuted;
       const btn = document.getElementById('muteBtn');
-      btn.textContent = isMuted ? 'Muted Speaker' : 'Speaker';
+      btn.textContent = isMuted ? 'UNM' : 'MUT';
       document.getElementById('volumeLevel').textContent = isMuted ? 'MUTE' : volume;
       saveState();
     }
@@ -1075,11 +1090,11 @@
       if (isDark) {
         body.classList.add('dark');
         radio.classList.add('dark');
-        btn.textContent = 'Moon';
+        btn.textContent = 'LIG';
       } else {
         body.classList.remove('dark');
         radio.classList.remove('dark');
-        btn.textContent = 'Sun';
+        btn.textContent = 'DAR';
       }
       saveState();
     }
@@ -1090,7 +1105,6 @@
       loadMenu();
       stationsBtn.addEventListener('click', toggleMenu);
 
-      // Cargar estado completo
       const savedState = loadState();
       if (savedState) {
         currentIndex = savedState.currentIndex;
@@ -1101,48 +1115,38 @@
         isMuted = savedState.isMuted;
       }
 
-      // Aplicar tema
       if (isDark) {
         document.body.classList.add('dark');
         document.getElementById('radio').classList.add('dark');
-        document.getElementById('themeBtn').textContent = 'Moon';
+        document.getElementById('themeBtn').textContent = 'LIG';
       }
 
-      // Aplicar power
       const powerBtn = document.getElementById('powerBtn');
-      if (isPowered) {
-        powerBtn.classList.add('on');
-      }
+      if (isPowered) powerBtn.classList.add('on');
 
-      // Reproducir última estación
       playStation(currentIndex);
       setVolume(volume);
 
-      // Aplicar mute
       if (isMuted) {
         audio.muted = true;
-        document.getElementById('muteBtn').textContent = 'Muted Speaker';
+        document.getElementById('muteBtn').textContent = 'UNM';
         document.getElementById('volumeLevel').textContent = 'MUTE';
       }
 
-      // Aplicar play/pause
       if (!isPlaying) {
-        document.getElementById('playPauseBtn').textContent = 'Play';
+        document.getElementById('playPauseBtn').textContent = 'PLA';
         document.getElementById('playStatus').textContent = 'Pausado';
         playbackIndicator.classList.add('paused');
       }
 
-      // Ajustar al redimensionar
       let resizeTimer;
       window.addEventListener('resize', () => {
         clearTimeout(resizeTimer);
         resizeTimer = setTimeout(() => {
-          centerActiveStation();
-          updateStationMarker();
+          centerStation(currentIndex);
         }, 100);
       });
 
-      // Guardar estado en cada cambio
       window.addEventListener('beforeunload', saveState);
     });
   </script>
