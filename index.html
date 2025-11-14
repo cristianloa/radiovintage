@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>CRadio – v2.4 Final</title>
+  <title>CRadio – v2.8 Final</title>
   <style>
     /* ======================
        GLOBAL & BODY
@@ -48,6 +48,7 @@
       transform: rotateX(6deg) rotateY(-3deg);
       overflow: visible;
       transition: all 0.5s ease, opacity 0.4s ease;
+      z-index: 1;
     }
     .radio.dark {
       background: linear-gradient(145deg, #1a1a1a, #262626);
@@ -56,6 +57,8 @@
         inset 0 -10px 16px rgba(0,0,0,0.4),
         inset 0 10px 16px rgba(255,255,255,0.05);
     }
+    .radio.off { opacity: 0.3; pointer-events: none; }
+    .radio.off * { pointer-events: none !important; }
 
     /* ======================
        LOGO
@@ -122,7 +125,7 @@
     }
 
     /* ======================
-       TOP CONTROLS
+       TOP CONTROLS (TEMA + ESTACIONES)
        ====================== */
     .top-controls {
       position: absolute;
@@ -130,55 +133,29 @@
       right: 5%;
       display: flex;
       align-items: center;
-      gap: 16px;
+      gap: 12px;
       z-index: 15;
     }
-    #powerBtn {
-      width: 70px; height: 40px;
-      background: linear-gradient(to bottom, #c0c0c0, #808080);
-      border: 3px solid #555;
-      border-radius: 8px;
-      position: relative;
+
+    /* TEMA BUTTON */
+    #themeBtn {
+      width: 50px; height: 50px;
+      background: radial-gradient(circle at 30% 30%, #f0f0f0, #d0d0d0);
+      border: 3px solid #999;
+      border-radius: 50%;
+      font-size: 14px; font-weight: bold; color: #333;
       cursor: pointer;
-      box-shadow: 0 4px 8px rgba(0,0,0,0.5), inset 0 2px 4px rgba(255,255,255,0.6), inset 0 -2px 4px rgba(0,0,0,0.4);
-      overflow: hidden;
-      transition: all 0.3s ease;
+      box-shadow: 0 6px 12px rgba(0,0,0,0.3), inset 0 2px 4px rgba(255,255,255,0.8);
+      transition: all 0.15s;
+      display: flex; align-items: center; justify-content: center;
       font-family: 'Courier New', monospace;
-      font-weight: bold;
-      font-size: 11px;
-      color: #600;
     }
-    .radio.dark #powerBtn {
-      background: linear-gradient(to bottom, #333, #111);
-      border: 3px solid #222;
-      box-shadow: 0 4px 8px rgba(0,0,0,0.8), inset 0 2px 4px rgba(255,107,53,0.2), inset 0 -2px 4px rgba(0,0,0,0.6);
-      color: #800;
+    .radio.dark #themeBtn {
+      background: radial-gradient(circle at 30% 30%, #2a2a2a, #1a1a1a);
+      border: 3px solid #444; color: #ff6b35;
+      box-shadow: 0 6px 12px rgba(0,0,0,0.7), inset 0 2px 4px rgba(255,107,53,0.2);
     }
-    #powerBtn::before {
-      content: ''; position: absolute;
-      top: 4px; left: 4px;
-      width: 28px; height: 28px;
-      background: linear-gradient(to bottom, #fff, #d0d0d0);
-      border-radius: 4px;
-      box-shadow: 0 2px 6px rgba(0,0,0,0.4), inset 0 1px 2px rgba(255,255,255,0.8);
-      transition: transform 0.3s cubic-bezier(0.2, 0.8, 0.4, 1);
-      z-index: 2;
-    }
-    .radio.dark #powerBtn::before {
-      background: linear-gradient(to bottom, #444, #222);
-      box-shadow: 0 2px 6px rgba(0,0,0,0.7), inset 0 1px 2px rgba(255,107,53,0.3);
-    }
-    #powerBtn .power-label {
-      position: absolute; top: 50%; transform: translateY(-50%);
-      width: 100%; text-align: center; z-index: 1; pointer-events: none;
-    }
-    #powerBtn .off-label { left: 8px; color: #600; }
-    #powerBtn .on-label { right: 8px; color: #0a0; opacity: 0; }
-    .radio.dark #powerBtn .off-label { color: #800; }
-    .radio.dark #powerBtn .on-label { color: #0c0; }
-    #powerBtn.on .off-label { opacity: 0; }
-    #powerBtn.on .on-label { opacity: 1; }
-    #powerBtn.on::before { transform: translateX(34px); }
+    #themeBtn:hover { transform: translateY(-2px); }
 
     .stations-btn { display: flex; flex-direction: column; align-items: center; cursor: pointer; gap: 4px; }
     .hamburger {
@@ -242,7 +219,7 @@
     .status-msg.show { opacity: 1; }
 
     /* ======================
-       PARRILLA + ONDAS GRANDES
+       PARRILLA + ONDAS
        ====================== */
     .grill {
       position: absolute; top: 28%; left: 50%; transform: translateX(-50%);
@@ -299,7 +276,7 @@
     }
 
     /* ======================
-       CARRUSEL: ESTACIÓN ROJA Y CENTRADA
+       CARRUSEL INFINITO – ESTACIÓN ACTIVA ROJA
        ====================== */
     .dial-window {
       position: absolute; bottom: 22%; left: 50%; transform: translateX(-50%);
@@ -315,10 +292,14 @@
       background: linear-gradient(to bottom, #0a0a0a, #000);
       box-shadow: inset 0 10px 20px rgba(255,107,53,0.1), 0 10px 20px rgba(0,0,0,0.8);
     }
-    .station-carousel { width: 100%; overflow: hidden; position: relative; height: 100%; display: flex; align-items: center; justify-content: center; }
+
+    .station-carousel {
+      width: 100%; overflow: hidden; position: relative; height: 100%; display: flex; align-items: center;
+    }
     .station-track {
       display: flex; transition: transform 0.6s cubic-bezier(0.32, 0, 0.07, 1);
-      gap: 12px; padding: 0 20px; height: 100%; align-items: center; will-change: transform;
+      gap: 12px; padding: 0 20px; height: 100%; align-items: center;
+      will-change: transform;
     }
     .station-item {
       flex: 0 0 auto; min-width: 120px; text-align: center;
@@ -330,37 +311,27 @@
     }
     .radio.dark .station-item { color: #ff8c00; }
 
-    /* ESTACIÓN EN REPRODUCCIÓN: ROJO BRILLANTE Y CENTRADA */
-    .station-item.center {
+    .station-item.active {
       transform: scale(1.4) !important;
       opacity: 1 !important;
       color: #fff !important;
       background: #c00 !important;
       font-size: 1.9vw !important;
       font-weight: 900 !important;
-      text-shadow: 
-        0 0 10px #ff0000,
-        0 0 20px #ff0000,
-        0 0 30px #ff0000,
-        0 0 40px #ff0000 !important;
+      text-shadow: 0 0 10px #ff0000, 0 0 20px #ff0000, 0 0 30px #ff0000, 0 0 40px #ff0000 !important;
       border-radius: 12px !important;
       padding: 10px 16px !important;
       z-index: 3 !important;
       animation: pulseRed 1.5s ease-in-out infinite alternate;
     }
     @keyframes pulseRed {
-      0% { 
-        text-shadow: 0 0 10px #ff0000, 0 0 20px #ff0000, 0 0 30px #ff0000, 0 0 40px #ff0000;
-        transform: scale(1.4);
-      }
-      100% { 
-        text-shadow: 0 0 14px #ff0000, 0 0 28px #ff0000, 0 0 42px #ff0000, 0 0 56px #ff0000;
-        transform: scale(1.45);
-      }
+      0% { text-shadow: 0 0 10px #ff0000, 0 0 20px #ff0000, 0 0 30px #ff0000, 0 0 40px #ff0000; transform: scale(1.4); }
+      100% { text-shadow: 0 0 14px #ff0000, 0 0 28px #ff0000, 0 0 42px #ff0000, 0 0 56px #ff0000; transform: scale(1.45); }
     }
+
     .station-item.adjacent { transform: scale(1); opacity: 0.8; z-index: 2; }
     .station-item.far { transform: scale(0.7); opacity: 0.3; z-index: 1; }
-    .station-item:hover:not(.center) { opacity: 0.9; transform: scale(0.95); }
+    .station-item:hover:not(.active) { opacity: 0.9; transform: scale(0.95); }
 
     .station-marker {
       position: absolute; top: -32px; left: 50%; transform: translateX(-50%);
@@ -406,11 +377,27 @@
 
     .volume-container {
       display: flex; align-items: center; justify-content: center;
-      gap: 10px; width: 100%; padding: 0 10px;
+      gap: 8px; width: 100%; padding: 0 10px;
     }
+    #muteBtn {
+      width: 50px; height: 50px;
+      background: radial-gradient(circle at 30% 30%, #f0f0f0, #d0d0d0);
+      border: 3px solid #999; border-radius: 50%;
+      font-size: 14px; font-weight: bold; color: #333;
+      cursor: pointer; box-shadow: 0 6px 12px rgba(0,0,0,0.3);
+      transition: all 0.15s; display: flex; align-items: center; justify-content: center;
+      font-family: 'Courier New', monospace;
+    }
+    .radio.dark #muteBtn {
+      background: radial-gradient(circle at 30% 30%, #2a2a2a, #1a1a1a);
+      border: 3px solid #444; color: #ff6b35;
+      box-shadow: 0 6px 12px rgba(0,0,0,0.7);
+    }
+    #muteBtn:hover { transform: translateY(-2px); }
+
     .volume-btn {
       width: 50px; height: 50px;
-      background: radial-gradient(circle at 30% 30%, #f0f0f0, #d0d0f0);
+      background: radial-gradient(circle at 30% 30%, #f0f0f0, #d0d0d0);
       border: 3px solid #999; border-radius: 50%;
       font-size: 22px; font-weight: bold; color: #333;
       cursor: pointer; box-shadow: 0 6px 12px rgba(0,0,0,0.3);
@@ -423,7 +410,6 @@
       box-shadow: 0 6px 12px rgba(0,0,0,0.7);
     }
     .volume-btn:hover { transform: translateY(-2px); }
-    .volume-btn:active { transform: translateY(2px); }
 
     .volume-slider {
       -webkit-appearance: none; width: 100%; max-width: 300px;
@@ -445,20 +431,106 @@
     }
     .radio.dark .volume-value { color: #ff8c00; }
 
+    /* ======================
+       PANEL INFERIOR – CON BOTÓN POWER
+       ====================== */
     .control-panel {
-      margin-top: 20px; background: #1a1a1a; padding: 12px 30px;
-      border-radius: 14px; color: #ff6b35; font-family: 'Courier New', monospace;
-      font-size: 1.1vw; box-shadow: 0 10px 24px rgba(0,0,0,0.5);
-      text-align: center; width: 90vw; max-width: 1100px;
+      margin-top: 20px;
+      background: #1a1a1a;
+      padding: 12px 30px;
+      border-radius: 14px;
+      color: #ff6b35;
+      font-family: 'Courier New', monospace;
+      font-size: 1.1vw;
+      box-shadow: 0 10px 24px rgba(0,0,0,0.5);
+      text-align: center;
+      width: 90vw;
+      max-width: 1100px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 10px;
+      z-index: 9999;
     }
     body.dark .control-panel { background: #000; box-shadow: 0 10px 24px rgba(0,0,0,0.9); }
-    .status { font-size: 1.2vw; }
+    .status { font-size: 1.2vw; white-space: nowrap; }
+
+    /* BOTÓN POWER EN PANEL INFERIOR */
+    #powerBtn {
+      width: 70px; height: 40px;
+      background: linear-gradient(to bottom, #c0c0c0, #808080);
+      border: 3px solid #555;
+      border-radius: 8px;
+      position: relative;
+      cursor: pointer;
+      box-shadow: 0 4px 8px rgba(0,0,0,0.5), inset 0 2px 4px rgba(255,255,255,0.6), inset 0 -2px 4px rgba(0,0,0,0.4);
+      overflow: hidden;
+      transition: all 0.3s ease;
+      font-family: 'Courier New', monospace;
+      font-weight: bold;
+      font-size: 11px;
+      color: #600;
+      z-index: 10000;
+    }
+    .radio.dark #powerBtn {
+      background: linear-gradient(to bottom, #333, #111);
+      border: 3px solid #222;
+      box-shadow: 0 4px 8px rgba(0,0,0,0.8), inset 0 2px 4px rgba(255,107,53,0.2), inset 0 -2px 4px rgba(0,0,0,0.6);
+      color: #800;
+    }
+
+    /* OFF: ROJO BRILLANTE, SOBRE TODO */
+    #powerBtn.off {
+      background: linear-gradient(to bottom, #ff3333, #cc0000) !important;
+      border: 3px solid #ff6666 !important;
+      box-shadow: 
+        0 0 30px rgba(255,0,0,0.9), 
+        0 0 50px rgba(255,0,0,0.7), 
+        0 6px 16px rgba(255,0,0,0.8) !important;
+      color: #fff !important;
+      text-shadow: 0 0 10px #fff, 0 0 20px #fff;
+      animation: pulseOff 1.5s ease-in-out infinite;
+      transform: scale(1.1);
+      z-index: 99999 !important;
+    }
+    @keyframes pulseOff {
+      0%, 100% { transform: scale(1.1); }
+      50% { transform: scale(1.15); }
+    }
+
+    #powerBtn::before {
+      content: ''; position: absolute;
+      top: 4px; left: 4px;
+      width: 28px; height: 28px;
+      background: linear-gradient(to bottom, #fff, #d0d0d0);
+      border-radius: 4px;
+      box-shadow: 0 2px 6px rgba(0,0,0,0.4), inset 0 1px 2px rgba(255,255,255,0.8);
+      transition: transform 0.3s cubic-bezier(0.2, 0.8, 0.4, 1);
+      z-index: 2;
+    }
+    .radio.dark #powerBtn::before {
+      background: linear-gradient(to bottom, #444, #222);
+      box-shadow: 0 2px 6px rgba(0,0,0,0.7), inset 0 1px 2px rgba(255,107,53,0.3);
+    }
+    #powerBtn .power-label {
+      position: absolute; top: 50%; transform: translateY(-50%);
+      width: 100%; text-align: center; z-index: 1; pointer-events: none;
+    }
+    #powerBtn .off-label { left: 8px; color: #600; }
+    #powerBtn .on-label { right: 8px; color: #0a0; opacity: 0; }
+    .radio.dark #powerBtn .off-label { color: #800; }
+    .radio.dark #powerBtn .on-label { color: #0c0; }
+    #powerBtn.on .off-label { opacity: 0; }
+    #powerBtn.on .on-label { opacity: 1; }
+    #powerBtn.on::before { transform: translateX(34px); }
 
     @media (max-width: 768px) {
       .playback-indicator { gap: 5px; height: 40px; }
       .wave-bar { width: 3px; height: 32px; }
-      .station-item.center { font-size: 3.5vw !important; }
+      .station-item.active { font-size: 3.5vw !important; }
       .station-marker { top: -28px; border-left: 14px solid transparent; border-right: 14px solid transparent; border-top: 18px solid #c00; }
+      .control-panel { flex-direction: column; gap: 8px; font-size: 2.5vw; }
+      #powerBtn { width: 60px; height: 36px; font-size: 10px; }
     }
   </style>
 </head>
@@ -476,12 +548,9 @@
       <div class="clock-face" id="clockDisplay">18:00</div>
     </div>
 
-    <!-- TOP CONTROLS -->
+    <!-- TOP CONTROLS: TEMA + ESTACIONES -->
     <div class="top-controls">
-      <button id="powerBtn" onclick="togglePower()">
-        <div class="power-label off-label">OFF</div>
-        <div class="power-label on-label">ON</div>
-      </button>
+      <button id="themeBtn" onclick="toggleTheme()">DAR</button>
 
       <div class="stations-btn" id="stationsBtn">
         <div class="hamburger">
@@ -492,7 +561,7 @@
       <div class="dropdown-menu" id="dropdownMenu"></div>
     </div>
 
-    <!-- Parrilla con ONDAS GRANDES -->
+    <!-- Parrilla -->
     <div class="grill">
       <div class="playback-indicator" id="playbackIndicator">
         <div class="wave-bar"></div><div class="wave-bar"></div><div class="wave-bar"></div>
@@ -502,7 +571,7 @@
       </div>
     </div>
 
-    <!-- Dial con Carrusel ROJO Y CENTRADO -->
+    <!-- Dial con CARRUSEL INFINITO -->
     <div class="dial-window">
       <div class="station-carousel">
         <div class="station-track" id="stationTrack"></div>
@@ -516,11 +585,10 @@
         <button class="control-btn" onclick="tunePrev()" title="Anterior">PRE</button>
         <button class="control-btn" id="playPauseBtn" onclick="togglePlayPause()" title="Reproducir/Pausar">PLA</button>
         <button class="control-btn" onclick="tuneNext()" title="Siguiente">NEX</button>
-        <button class="control-btn" id="muteBtn" onclick="toggleMute()" title="Silenciar">MUT</button>
-        <button class="control-btn" id="themeBtn" onclick="toggleTheme()" title="Tema">THE</button>
       </div>
 
       <div class="volume-container">
+        <button id="muteBtn" onclick="toggleMute()">MUT</button>
         <button class="volume-btn" onclick="changeVolume(-10)">-</button>
         <input type="range" class="volume-slider" id="volumeSlider" min="0" max="100" value="50" oninput="setVolume(this.value)">
         <button class="volume-btn" onclick="changeVolume(10)">+</button>
@@ -529,16 +597,19 @@
     </div>
   </div>
 
-  <!-- PANEL INFERIOR LIMPIO -->
+  <!-- PANEL INFERIOR CON BOTÓN POWER -->
   <div class="control-panel">
     <div class="status">Estado: <span id="playStatus">Reproduciendo</span> | <span id="powerStatus" style="color:#0f0;">(ON)</span></div>
+    <button id="powerBtn" class="off" onclick="togglePower()">
+      <div class="power-label off-label">OFF</div>
+      <div class="power-label on-label">ON</div>
+    </button>
   </div>
 
   <!-- AUDIO -->
   <audio id="radioAudio" preload="auto" crossorigin="anonymous"></audio>
 
   <script>
-    // ESTACIONES (SIN "RADIO")
     const stationsList = [
       { name: 'LOFI 24/7', url: 'https://ec3.yesstreaming.net:3755/stream', favorite: true },
       { name: 'Oxígeno', url: 'https://mdstrm.com/audio/5fab0687bcd6c2389ee9480c/icecast.audio' },
@@ -571,7 +642,6 @@
       { name: '2', url: 'https://panelautodj.innovatestream.pe:10951' },
     ];
 
-    // Estado
     let volume = 50, isMuted = false, isPlaying = true, isPowered = true, isDark = false, currentIndex = 0;
     const audio = document.getElementById('radioAudio');
     const stationTrack = document.getElementById('stationTrack');
@@ -581,7 +651,6 @@
     const statusMsg = document.getElementById('statusMsg');
     let itemWidthCache = null, resizeTimeout = null;
 
-    // Persistencia
     function saveState() {
       const state = { currentIndex, isDark, isPowered, isPlaying, volume, isMuted };
       localStorage.setItem('cradioState', JSON.stringify(state));
@@ -607,57 +676,67 @@
 
     function playStatic() {
       const overlay = document.createElement('div');
-      overlay.className = 'static-overlay';
+      overlay.style.cssText = `
+        position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+        background: url('data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVR42mNkYPhfDwAChwGA60e6kgAAAABJRU5ErkJggg==') repeat;
+        opacity: 0.3; pointer-events: none; z-index: 9999; animation: static 0.4s steps(1) infinite;
+      `;
       document.body.appendChild(overlay);
       setTimeout(() => overlay.remove(), 400);
     }
 
-    function loadAllStations() {
+    function loadInfiniteCarousel() {
       stationTrack.innerHTML = '';
-      const total = stationsList.length;
-      const extended = [...stationsList, ...stationsList, ...stationsList];
-      for (let i = 0; i < extended.length; i++) {
-        const div = document.createElement('div');
-        div.className = 'station-item';
-        div.textContent = extended[i].name;
-        div.dataset.index = i % total;
-        div.onclick = () => { playStatic(); playStation(i % total); };
-        stationTrack.appendChild(div);
+      const copies = 5;
+      for (let c = 0; c < copies; c++) {
+        stationsList.forEach((station, i) => {
+          const div = document.createElement('div');
+          div.className = 'station-item';
+          div.textContent = station.name;
+          div.dataset.index = i;
+          div.onclick = () => { if (isPowered) { playStatic(); playStation(i); } };
+          stationTrack.appendChild(div);
+        });
       }
-      setTimeout(() => centerStation(currentIndex), 50);
+      setTimeout(() => centerStation(currentIndex), 100);
     }
 
-    // CENTRADO PERFECTO + MARCADOR
     function centerStation(index) {
       const items = document.querySelectorAll('.station-item');
       if (items.length === 0) return;
 
-      const total = stationsList.length;
-      const offset = total + index;
       const itemWidth = getItemWidth();
       const container = document.querySelector('.station-carousel');
       const containerWidth = container.offsetWidth;
       const centerOffset = (containerWidth - itemWidth) / 2;
+      const targetPos = index * itemWidth + centerOffset;
+      const offsetX = -targetPos + containerWidth / 2;
 
-      items.forEach((item, i) => {
-        let distance = Math.abs(i - offset);
-        const wrapDistance = items.length - distance;
-        distance = Math.min(distance, wrapDistance);
-        item.classList.remove('center', 'adjacent', 'far');
-        if (distance === 0) item.classList.add('center');
-        else if (distance === 1) item.classList.add('adjacent');
-        else if (distance <= 3) item.classList.add('far');
+      stationTrack.style.transform = `translateX(${offsetX}px)`;
+
+      items.forEach(item => {
+        const rect = item.getBoundingClientRect();
+        const dialRect = container.getBoundingClientRect();
+        const centerX = dialRect.left + dialRect.width / 2;
+        const itemCenter = rect.left + rect.width / 2;
+        const distance = Math.abs(centerX - itemCenter);
+
+        item.classList.remove('active', 'adjacent', 'far');
+        if (parseInt(item.dataset.index) === currentIndex) {
+          item.classList.add('active');
+        } else if (distance < 100) {
+          item.classList.add('adjacent');
+        } else if (distance < 200) {
+          item.classList.add('far');
+        }
       });
 
-      const translateX = -offset * itemWidth + centerOffset;
-      stationTrack.style.transform = `translateX(${translateX}px)`;
-
-      const activeItem = items[offset];
+      const activeItem = [...items].find(item => item.classList.contains('active'));
       if (activeItem) {
         const rect = activeItem.getBoundingClientRect();
-        const dialRect = document.querySelector('.dial-window').getBoundingClientRect();
-        const centerX = rect.left + rect.width / 2 - dialRect.left;
-        stationMarker.style.left = `${centerX}px`;
+        const dialRect = container.getBoundingClientRect();
+        const markerX = rect.left + rect.width / 2 - dialRect.left;
+        stationMarker.style.left = `${markerX}px`;
       }
     }
 
@@ -668,12 +747,12 @@
         div.className = 'menu-item';
         div.innerHTML = `${station.name} ${station.favorite ? '<span class="favorite-star">⭐</span>' : ''}`;
         div.dataset.index = i;
-        div.onclick = () => { playStatic(); playStation(i); closeMenu(); };
+        div.onclick = () => { if (isPowered) { playStatic(); playStation(i); closeMenu(); } };
         dropdownMenu.appendChild(div);
       });
     }
 
-    function toggleMenu() { dropdownMenu.classList.toggle('show'); }
+    function toggleMenu() { if (isPowered) dropdownMenu.classList.toggle('show'); }
     function closeMenu() { dropdownMenu.classList.remove('show'); }
     document.addEventListener('click', e => {
       if (!stationsBtn.contains(e.target) && !dropdownMenu.contains(e.target)) closeMenu();
@@ -740,18 +819,23 @@
       const powerBtn = document.getElementById('powerBtn');
 
       if (isPowered) {
-        radio.style.opacity = '1'; status.textContent = '(ON)'; status.style.color = '#0f0';
-        powerBtn.classList.add('on'); isPlaying = true;
+        radio.classList.remove('off');
+        status.textContent = '(ON)'; status.style.color = '#0f0';
+        powerBtn.classList.remove('off'); powerBtn.classList.add('on');
+        isPlaying = true;
         document.getElementById('playPauseBtn').textContent = 'PAU';
         document.getElementById('playStatus').textContent = 'Reproduciendo';
         playStation(currentIndex);
       } else {
-        radio.style.opacity = '0.3'; status.textContent = '(OFF)'; status.style.color = '#f00';
-        powerBtn.classList.remove('on'); isPlaying = false;
+        radio.classList.add('off');
+        status.textContent = '(OFF)'; status.style.color = '#f00';
+        powerBtn.classList.add('off'); powerBtn.classList.remove('on');
+        isPlaying = false;
         document.getElementById('playPauseBtn').textContent = 'PLA';
         document.getElementById('playStatus').textContent = 'Apagado';
         audio.pause();
       }
+      centerStation(currentIndex);
       updatePlaybackAnimation(); saveState();
     }
 
@@ -801,7 +885,7 @@
     });
 
     document.addEventListener('DOMContentLoaded', function() {
-      loadAllStations(); loadMenu(); stationsBtn.addEventListener('click', toggleMenu);
+      loadInfiniteCarousel(); loadMenu(); stationsBtn.addEventListener('click', toggleMenu);
       const savedState = loadState();
       if (savedState) {
         currentIndex = savedState.currentIndex; isDark = savedState.isDark;
@@ -816,7 +900,14 @@
       }
 
       const powerBtn = document.getElementById('powerBtn');
-      if (isPowered) powerBtn.classList.add('on');
+      const radio = document.getElementById('radio');
+      if (isPowered) {
+        powerBtn.classList.remove('off'); powerBtn.classList.add('on');
+        radio.classList.remove('off');
+      } else {
+        powerBtn.classList.add('off');
+        radio.classList.add('off');
+      }
 
       playStation(currentIndex); setVolume(volume);
       if (isMuted) { audio.muted = true; document.getElementById('muteBtn').textContent = 'UNM'; document.getElementById('volumeLevel').textContent = 'MUTE'; }
