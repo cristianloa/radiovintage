@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>CRadio – Vintage con Menú y Power Clásico</title>
+  <title>CRadio – Radio Vintage (Menú Desplegable)</title>
   <style>
     /* ======================
        GLOBAL & BODY
@@ -125,110 +125,25 @@
     }
 
     /* ======================
-       TOP CONTROLS: POWER + MENU
+       MENU DESPLEGABLE (ANTES DE LA DIAL)
        ====================== */
-    .top-controls {
+    .menu-container {
       position: absolute;
       top: 5%;
       right: 5%;
-      display: flex;
-      align-items: center;
-      gap: 16px;
       z-index: 15;
     }
 
-    /* BOTÓN POWER: ESTILO CLÁSICO DE RADIO VINTAGE (MECÁNICO) */
-    #powerBtn {
-      width: 70px;
-      height: 40px;
-      background: linear-gradient(to bottom, #c0c0c0, #808080);
-      border: 3px solid #555;
-      border-radius: 8px;
-      position: relative;
-      cursor: pointer;
-      box-shadow: 
-        0 4px 8px rgba(0,0,0,0.5),
-        inset 0 2px 4px rgba(255,255,255,0.6),
-        inset 0 -2px 4px rgba(0,0,0,0.4);
-      overflow: hidden;
-      transition: all 0.3s ease;
-    }
-
-    .radio.dark #powerBtn {
-      background: linear-gradient(to bottom, #333, #111);
-      border: 3px solid #222;
-      box-shadow: 
-        0 4px 8px rgba(0,0,0,0.8),
-        inset 0 2px 4px rgba(255,107,53,0.2),
-        inset 0 -2px 4px rgba(0,0,0,0.6);
-    }
-
-    #powerBtn::before {
-      content: '';
-      position: absolute;
-      top: 4px;
-      left: 4px;
-      width: 28px;
-      height: 28px;
-      background: linear-gradient(to bottom, #fff, #d0d0d0);
-      border-radius: 4px;
-      box-shadow: 
-        0 2px 6px rgba(0,0,0,0.4),
-        inset 0 1px 2px rgba(255,255,255,0.8);
-      transition: transform 0.3s cubic-bezier(0.2, 0.8, 0.4, 1);
-      z-index: 2;
-    }
-
-    .radio.dark #powerBtn::before {
-      background: linear-gradient(to bottom, #444, #222);
-      box-shadow: 
-        0 2px 6px rgba(0,0,0,0.7),
-        inset 0 1px 2px rgba(255,107,53,0.3);
-    }
-
-    #powerBtn::after {
-      content: 'OFF';
-      position: absolute;
-      top: 50%;
-      left: 10px;
-      transform: translateY(-50%);
-      font-family: 'Courier New', monospace;
-      font-weight: bold;
-      font-size: 10px;
-      color: #600;
-      z-index: 1;
-    }
-
-    #powerBtn.on::after {
-      content: 'ON';
-      color: #0a0;
-      left: 42px;
-    }
-
-    .radio.dark #powerBtn::after { color: #800; }
-    .radio.dark #powerBtn.on::after { color: #0c0; }
-
-    #powerBtn.on::before {
-      transform: translateX(34px);
-    }
-
-    /* MENU ESTACIONES */
-    .menu-container {
-      position: relative;
-    }
-
     .menu-toggle {
-      width: 80px;
-      height: 40px;
+      width: 50px;
+      height: 50px;
       background: linear-gradient(to bottom, #f0f0f0, #d0d0d0);
       border: 2px solid #999;
-      border-radius: 8px;
-      font-family: 'Courier New', monospace;
-      font-weight: bold;
-      font-size: 12px;
+      border-radius: 50%;
+      font-size: 20px;
       color: #333;
       cursor: pointer;
-      box-shadow: 0 4px 8px rgba(0,0,0,0.3), inset 0 1px 3px rgba(255,255,255,0.8);
+      box-shadow: 0 4px 8px rgba(0,0,0,0.3);
       display: flex;
       align-items: center;
       justify-content: center;
@@ -239,14 +154,14 @@
       background: linear-gradient(to bottom, #2a2a2a, #1a1a1a);
       border: 2px solid #444;
       color: #ff6b35;
-      box-shadow: 0 4px 8px rgba(0,0,0,0.7), inset 0 1px 3px rgba(255,107,53,0.2);
+      box-shadow: 0 4px 8px rgba(0,0,0,0.7);
     }
 
-    .menu-toggle:hover { transform: translateY(-2px); }
+    .menu-toggle:hover { transform: scale(1.1); }
 
     .dropdown-menu {
       position: absolute;
-      top: 50px;
+      top: 60px;
       right: 0;
       width: 280px;
       max-height: 320px;
@@ -339,7 +254,7 @@
     .radio.dark .grill::before { background: #000; }
 
     /* ======================
-       DIAL: 4 ESTACIONES VISIBLES + DESPLAZAMIENTO
+       DIAL WINDOW (SOLO ESTACIÓN ACTUAL)
        ====================== */
     .dial-window {
       position: absolute;
@@ -353,12 +268,12 @@
       background: linear-gradient(to bottom, #222, #111);
       border-radius: 18px;
       box-shadow: inset 0 10px 20px rgba(255,255,255,0.1), 0 10px 20px rgba(0,0,0,0.4);
-      overflow: hidden;
+      overflow: visible;
       border: 5px solid #333;
       z-index: 1;
       display: flex;
       align-items: center;
-      padding: 0 10px;
+      justify-content: center;
     }
 
     .radio.dark .dial-window {
@@ -366,56 +281,20 @@
       box-shadow: inset 0 10px 20px rgba(255,107,53,0.1), 0 10px 20px rgba(0,0,0,0.8);
     }
 
-    .station-carousel {
-      display: flex;
-      align-items: center;
-      width: 100%;
-      overflow: hidden;
-      position: relative;
-    }
-
-    .station-track {
-      display: flex;
-      transition: transform 0.5s ease;
-      gap: 12px;
-      padding: 0 20px;
-    }
-
-    .station-item {
-      flex: 0 0 auto;
-      min-width: 120px;
-      text-align: center;
+    .current-station-display {
       font-weight: bold;
-      font-size: 1.3vw;
-      color: #ccc;
-      text-shadow: 0 1px 2px #000;
-      transition: all 0.3s;
-      cursor: pointer;
-      padding: 6px 8px;
-      border-radius: 6px;
+      font-size: 2.2vw;
+      color: #fff;
+      text-shadow: 0 0 12px #ff6b35, 0 0 24px #ff4500;
+      letter-spacing: 2px;
     }
 
-    .radio.dark .station-item {
+    .radio.dark .current-station-display {
       color: #ff8c00;
+      text-shadow: 0 0 16px #ff4500, 0 2px 4px #000;
     }
 
-    .station-item.active {
-      color: #fff;
-      font-size: 1.5vw;
-      text-shadow: 0 0 14px #ff6b35, 0 0 24px #ff4500;
-      background: rgba(255,107,53,0.2);
-    }
-
-    .station-item:hover:not(.active) {
-      color: #fff;
-      background: rgba(255,255,255,0.1);
-    }
-
-    .radio.dark .station-item:hover:not(.active) {
-      background: rgba(255,107,53,0.15);
-    }
-
-    /* PUNTERO ROJO: SOBRE LA ESTACIÓN ACTIVA */
+    /* PUNTERO ROJO: JUSTO SOBRE EL TEXTO */
     .pointer {
       position: absolute;
       top: -32px;
@@ -427,7 +306,7 @@
       border-right: 18px solid transparent;
       border-top: 36px solid #c00;
       filter: drop-shadow(0 8px 12px rgba(0,0,0,0.7));
-      transition: left 0.5s ease, border-top-color 0.5s ease;
+      transition: left 0.4s ease, border-top-color 0.5s ease;
       z-index: 10;
       pointer-events: none;
     }
@@ -494,6 +373,57 @@
     button.control-btn:active {
       transform: translateY(1px);
       box-shadow: 0 2px 4px rgba(0,0,0,0.4);
+    }
+
+    /* BOTÓN POWER: ESTILO MAC */
+    #powerBtn {
+      width: 70px;
+      height: 36px;
+      background: #e5e5e5;
+      border: 1px solid #bbb;
+      border-radius: 18px;
+      position: relative;
+      cursor: pointer;
+      overflow: hidden;
+      box-shadow: inset 0 1px 3px rgba(0,0,0,0.2), 0 2px 4px rgba(0,0,0,0.15);
+      transition: background 0.3s ease;
+    }
+
+    .radio.dark #powerBtn {
+      background: #333;
+      border: 1px solid #555;
+      box-shadow: inset 0 1px 3px rgba(0,0,0,0.6), 0 2px 4px rgba(0,0,0,0.4);
+    }
+
+    #powerBtn::before {
+      content: '';
+      position: absolute;
+      top: 2px;
+      left: 2px;
+      width: 32px;
+      height: 32px;
+      background: linear-gradient(to bottom, #fff, #e0e0e0);
+      border-radius: 50%;
+      box-shadow: 0 2px 6px rgba(0,0,0,0.3);
+      transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+      z-index: 2;
+    }
+
+    .radio.dark #powerBtn::before {
+      background: linear-gradient(to bottom, #444, #222);
+      box-shadow: 0 2px 6px rgba(0,0,0,0.7);
+    }
+
+    #powerBtn.on {
+      background: #4cd964;
+    }
+
+    .radio.dark #powerBtn.on {
+      background: #30d158;
+    }
+
+    #powerBtn.on::before {
+      transform: translateX(34px);
     }
 
     /* VOLUMEN */
@@ -601,19 +531,17 @@
       .clock-face { font-size: 5.5vw !important; }
       .control-buttons { gap: 6px; }
       button.control-btn { width: 42px; height: 42px; font-size: 16px; }
+      #powerBtn { width: 60px; height: 32px; }
+      #powerBtn::before { width: 28px; height: 28px; top: 2px; left: 2px; }
+      #powerBtn.on::before { transform: translateX(28px); }
       .volume-btn { width: 36px; height: 36px; font-size: 18px; }
       .volume-slider { max-width: 200px; }
       .volume-value { font-size: 3.5vw; }
       .logo, .control-panel, .freq { font-size: 3.5vw !important; }
-      .station-item { font-size: 2.8vw !important; min-width: 90px; }
-      .station-item.active { font-size: 3.5vw !important; }
+      .current-station-display { font-size: 4.5vw !important; }
       .pointer { top: -28px; border-left: 14px solid transparent; border-right: 14px solid transparent; border-top: 32px solid #c00; }
       .radio.dark .pointer { border-top-color: #ff6b35; }
-      .top-controls { gap: 10px; }
-      #powerBtn { width: 60px; height: 36px; }
-      #powerBtn::before { width: 24px; height: 24px; top: 4px; left: 4px; }
-      #powerBtn.on::before { transform: translateX(28px); }
-      .menu-toggle { width: 70px; height: 36px; font-size: 11px; }
+      .menu-toggle { width: 44px; height: 44px; font-size: 18px; }
       .dropdown-menu { width: 240px; max-height: 280px; }
       .menu-item { font-size: 1rem; padding: 10px 14px; }
     }
@@ -630,29 +558,27 @@
       <div class="clock-face" id="clockDisplay">18:00</div>
     </div>
 
-    <!-- TOP CONTROLS: POWER + ESTACIONES -->
-    <div class="top-controls">
-      <button class="control-btn" id="powerBtn" onclick="togglePower()"></button>
-      <div class="menu-container">
-        <button class="menu-toggle" id="menuToggle">ESTACIONES</button>
-        <div class="dropdown-menu" id="dropdownMenu"></div>
+    <!-- MENU DESPLEGABLE -->
+    <div class="menu-container">
+      <button class="menu-toggle" id="menuToggle">Menu</button>
+      <div class="dropdown-menu" id="dropdownMenu">
+        <!-- Estaciones se generan aquí -->
       </div>
     </div>
 
     <!-- Parrilla -->
     <div class="grill"></div>
 
-    <!-- Dial: 4 estaciones visibles -->
+    <!-- Dial (solo estación actual) -->
     <div class="dial-window">
-      <div class="station-carousel">
-        <div class="station-track" id="stationTrack"></div>
-      </div>
+      <div class="current-station-display" id="currentStationDisplay">LOFI 24/7</div>
       <div class="pointer" id="pointer"></div>
     </div>
 
     <!-- CONTROLES -->
     <div class="playback-controls">
       <div class="control-buttons">
+        <button class="control-btn" id="powerBtn" onclick="togglePower()"></button>
         <button class="control-btn" onclick="tunePrev()">Previous Track</button>
         <button class="control-btn" id="playPauseBtn" onclick="togglePlayPause()">Play</button>
         <button class="control-btn" onclick="tuneNext()">Next Track</button>
@@ -673,15 +599,15 @@
   <!-- PANEL DE ESTADO -->
   <div class="control-panel">
     <div class="status">CRadio – <span id="currentStation">LOFI 24/7</span> <span id="powerStatus" style="color:#0f0;">(ON)</span></div>
-    <div class="freq" id="currentFreq">LOFI 24/7</div>
+    <div class="freq" id="currentFreq">LOFI 24/7</div453
     <div class="status">Estado: <span id="playStatus">Reproduciendo</span></div>
   </div>
 
-  <!-- AUDIO -->
+  <!-- AUDIO ELEMENT -->
   <audio id="radioAudio" preload="none" crossorigin="anonymous"></audio>
 
   <script>
-    // ESTACIONES
+    // LISTA DE ESTACIONES
     const stationsList = [
       { name: 'LOFI 24/7', url: 'https://ec3.yesstreaming.net:3755/stream' },
       { name: 'Radio Oxígeno', url: 'https://mdstrm.com/audio/5fab0687bcd6c2389ee9480c/icecast.audio' },
@@ -722,11 +648,10 @@
     let isDark = false;
     let currentIndex = 0;
     const audio = document.getElementById('radioAudio');
-    const stationTrack = document.getElementById('stationTrack');
     const dropdownMenu = document.getElementById('dropdownMenu');
     const menuToggle = document.getElementById('menuToggle');
 
-    // Cargar menú completo
+    // Cargar menú
     function loadMenu() {
       dropdownMenu.innerHTML = '';
       stationsList.forEach((station, i) => {
@@ -742,34 +667,6 @@
       });
     }
 
-    // Cargar 4 estaciones visibles
-    function loadVisibleStations() {
-      stationTrack.innerHTML = '';
-      const start = Math.max(0, currentIndex - 1);
-      const end = Math.min(stationsList.length, currentIndex + 3);
-      for (let i = start; i < end; i++) {
-        const div = document.createElement('div');
-        div.className = 'station-item';
-        div.textContent = stationsList[i].name;
-        div.dataset.index = i;
-        div.onclick = () => playStation(i);
-        if (i === currentIndex) div.classList.add('active');
-        stationTrack.appendChild(div);
-      }
-    }
-
-    // Desplazar carrusel
-    function updateCarousel() {
-      const items = document.querySelectorAll('.station-item');
-      const activeItem = items[currentIndex % 4] || items[0];
-      if (activeItem) {
-        const trackWidth = stationTrack.offsetWidth;
-        const itemWidth = activeItem.offsetWidth + 12;
-        const offset = (currentIndex % 4) * -itemWidth;
-        stationTrack.style.transform = `translateX(${offset}px)`;
-      }
-    }
-
     // Abrir/cerrar menú
     function toggleMenu() {
       dropdownMenu.classList.toggle('show');
@@ -779,6 +676,7 @@
       dropdownMenu.classList.remove('show');
     }
 
+    // Cerrar al hacer clic fuera
     document.addEventListener('click', (e) => {
       if (!menuToggle.contains(e.target) && !dropdownMenu.contains(e.target)) {
         closeMenu();
@@ -796,7 +694,7 @@
     setInterval(updateClock, 1000);
     updateClock();
 
-    // Reproducir
+    // Reproducir estación
     function playStation(index) {
       if (!isPowered) return;
       currentIndex = index;
@@ -808,23 +706,21 @@
       updateMenuActive();
     }
 
+    // Actualizar display y puntero
     function updateDisplay() {
-      loadVisibleStations();
-      updateCarousel();
-      updatePointer();
       const station = stationsList[currentIndex];
+      document.getElementById('currentStationDisplay').textContent = station.name;
       document.getElementById('currentStation').textContent = station.name;
       document.getElementById('currentFreq').textContent = station.name;
-    }
 
-    function updatePointer() {
-      const activeItem = document.querySelector('.station-item.active');
+      const display = document.getElementById('currentStationDisplay');
       const dialWindow = document.querySelector('.dial-window');
       const pointer = document.getElementById('pointer');
-      if (activeItem && dialWindow) {
-        const itemRect = activeItem.getBoundingClientRect();
+
+      if (display && dialWindow) {
+        const displayRect = display.getBoundingClientRect();
         const dialRect = dialWindow.getBoundingClientRect();
-        const relativeLeft = itemRect.left - dialRect.left + (itemRect.width / 2);
+        const relativeLeft = displayRect.left - dialRect.left + (displayRect.width / 2);
         pointer.style.left = `${relativeLeft}px`;
       }
     }
@@ -835,7 +731,7 @@
       });
     }
 
-    // Navegación
+    // Sintonía
     function tuneNext() { if (isPowered) { currentIndex = (currentIndex + 1) % stationsList.length; playStation(currentIndex); } }
     function tunePrev() { if (isPowered) { currentIndex = (currentIndex - 1 + stationsList.length) % stationsList.length; playStation(currentIndex); } }
 
@@ -850,7 +746,7 @@
       else audio.pause();
     }
 
-    // Power
+    // Encendido/Apagado
     function togglePower() {
       isPowered = !isPowered;
       const radio = document.getElementById('radio');
@@ -927,9 +823,7 @@
       menuToggle.addEventListener('click', toggleMenu);
       playStation(0);
       setVolume(50);
-      window.addEventListener('resize', () => {
-        updateDisplay();
-      });
+      window.addEventListener('resize', updateDisplay);
     });
   </script>
 
