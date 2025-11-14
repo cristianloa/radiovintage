@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>CRadio – Estación Siempre en el Centro + Animación Real</title>
+  <title>CRadio – v2.4 Final</title>
   <style>
     /* ======================
        GLOBAL & BODY
@@ -13,6 +13,7 @@
       height: 100%;
       margin: 0;
       overflow: hidden;
+      user-select: none;
     }
     body {
       background: #2c3e50;
@@ -26,7 +27,6 @@
       transition: background 0.5s ease;
       padding: 20px;
     }
-
     body.dark { background: #0a0a0a; }
 
     /* ======================
@@ -47,9 +47,8 @@
       transform-style: preserve-3d;
       transform: rotateX(6deg) rotateY(-3deg);
       overflow: visible;
-      transition: all 0.5s ease;
+      transition: all 0.5s ease, opacity 0.4s ease;
     }
-
     .radio.dark {
       background: linear-gradient(145deg, #1a1a1a, #262626);
       box-shadow: 
@@ -73,7 +72,6 @@
       letter-spacing: 4px;
       transition: all 0.5s ease;
     }
-
     .radio.dark .logo {
       color: #ff6b35;
       text-shadow: 2px 2px 0 #000, 0 0 14px #ff4500;
@@ -97,13 +95,11 @@
       z-index: 10;
       overflow: hidden;
     }
-
     .radio.dark .clock-section {
       background: radial-gradient(circle at 30% 30%, #2d2d2d, #1f1f1f);
       border: 14px solid #8b5a2b;
       box-shadow: inset 0 8px 16px rgba(0,0,0,0.6), 0 10px 24px rgba(0,0,0,0.7);
     }
-
     .clock-face {
       position: absolute;
       inset: 14px;
@@ -119,7 +115,6 @@
       text-shadow: 0 2px 4px rgba(0,0,0,0.3);
       z-index: 2;
     }
-
     .radio.dark .clock-face {
       background: #111;
       color: #ff6b35;
@@ -138,19 +133,14 @@
       gap: 16px;
       z-index: 15;
     }
-
     #powerBtn {
-      width: 70px;
-      height: 40px;
+      width: 70px; height: 40px;
       background: linear-gradient(to bottom, #c0c0c0, #808080);
       border: 3px solid #555;
       border-radius: 8px;
       position: relative;
       cursor: pointer;
-      box-shadow: 
-        0 4px 8px rgba(0,0,0,0.5),
-        inset 0 2px 4px rgba(255,255,255,0.6),
-        inset 0 -2px 4px rgba(0,0,0,0.4);
+      box-shadow: 0 4px 8px rgba(0,0,0,0.5), inset 0 2px 4px rgba(255,255,255,0.6), inset 0 -2px 4px rgba(0,0,0,0.4);
       overflow: hidden;
       transition: all 0.3s ease;
       font-family: 'Courier New', monospace;
@@ -158,600 +148,324 @@
       font-size: 11px;
       color: #600;
     }
-
     .radio.dark #powerBtn {
       background: linear-gradient(to bottom, #333, #111);
       border: 3px solid #222;
-      box-shadow: 
-        0 4px 8px rgba(0,0,0,0.8),
-        inset 0 2px 4px rgba(255,107,53,0.2),
-        inset 0 -2px 4px rgba(0,0,0,0.6);
+      box-shadow: 0 4px 8px rgba(0,0,0,0.8), inset 0 2px 4px rgba(255,107,53,0.2), inset 0 -2px 4px rgba(0,0,0,0.6);
       color: #800;
     }
-
     #powerBtn::before {
-      content: '';
-      position: absolute;
-      top: 4px;
-      left: 4px;
-      width: 28px;
-      height: 28px;
+      content: ''; position: absolute;
+      top: 4px; left: 4px;
+      width: 28px; height: 28px;
       background: linear-gradient(to bottom, #fff, #d0d0d0);
       border-radius: 4px;
-      box-shadow: 
-        0 2px 6px rgba(0,0,0,0.4),
-        inset 0 1px 2px rgba(255,255,255,0.8);
+      box-shadow: 0 2px 6px rgba(0,0,0,0.4), inset 0 1px 2px rgba(255,255,255,0.8);
       transition: transform 0.3s cubic-bezier(0.2, 0.8, 0.4, 1);
       z-index: 2;
     }
-
     .radio.dark #powerBtn::before {
       background: linear-gradient(to bottom, #444, #222);
-      box-shadow: 
-        0 2px 6px rgba(0,0,0,0.7),
-        inset 0 1px 2px rgba(255,107,53,0.3);
+      box-shadow: 0 2px 6px rgba(0,0,0,0.7), inset 0 1px 2px rgba(255,107,53,0.3);
     }
-
     #powerBtn .power-label {
-      position: absolute;
-      top: 50%;
-      transform: translateY(-50%);
-      width: 100%;
-      text-align: center;
-      z-index: 1;
-      pointer-events: none;
+      position: absolute; top: 50%; transform: translateY(-50%);
+      width: 100%; text-align: center; z-index: 1; pointer-events: none;
     }
-
     #powerBtn .off-label { left: 8px; color: #600; }
     #powerBtn .on-label { right: 8px; color: #0a0; opacity: 0; }
     .radio.dark #powerBtn .off-label { color: #800; }
     .radio.dark #powerBtn .on-label { color: #0c0; }
-
     #powerBtn.on .off-label { opacity: 0; }
     #powerBtn.on .on-label { opacity: 1; }
     #powerBtn.on::before { transform: translateX(34px); }
 
-    .stations-btn {
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      cursor: pointer;
-      gap: 4px;
-    }
-
+    .stations-btn { display: flex; flex-direction: column; align-items: center; cursor: pointer; gap: 4px; }
     .hamburger {
-      width: 36px;
-      height: 36px;
+      width: 36px; height: 36px;
       background: radial-gradient(circle at 30% 30%, #f0f0f0, #d0d0d0);
       border: 3px solid #999;
       border-radius: 50%;
-      display: flex;
-      flex-direction: column;
-      justify-content: center;
-      align-items: center;
+      display: flex; flex-direction: column; justify-content: center; align-items: center;
       gap: 3px;
       box-shadow: 0 4px 8px rgba(0,0,0,0.3), inset 0 1px 3px rgba(255,255,255,0.8);
       transition: all 0.2s;
     }
-
     .radio.dark .hamburger {
       background: radial-gradient(circle at 30% 30%, #2a2a2a, #1a1a1a);
       border: 3px solid #444;
       box-shadow: 0 4px 8px rgba(0,0,0,0.7), inset 0 1px 3px rgba(255,107,53,0.2);
     }
-
-    .hamburger span {
-      width: 18px;
-      height: 2px;
-      background: #333;
-      border-radius: 1px;
-    }
-
+    .hamburger span { width: 18px; height: 2px; background: #333; border-radius: 1px; }
     .radio.dark .hamburger span { background: #ff6b35; }
-
-    .stations-label {
-      font-family: 'Courier New', monospace;
-      font-size: 10px;
-      color: #333;
-      text-transform: uppercase;
-      letter-spacing: 1px;
-    }
-
+    .stations-label { font-family: 'Courier New', monospace; font-size: 10px; color: #333; text-transform: uppercase; letter-spacing: 1px; }
     .radio.dark .stations-label { color: #ff8c00; }
-
     .stations-btn:hover .hamburger { transform: translateY(-2px); }
 
     .dropdown-menu {
-      position: absolute;
-      top: 90px;
-      right: 0;
-      width: 280px;
-      max-height: 320px;
-      background: #fff;
-      border-radius: 14px;
+      position: absolute; top: 90px; right: 0;
+      width: 280px; max-height: 320px;
+      background: #fff; border-radius: 14px;
       box-shadow: 0 12px 32px rgba(0,0,0,0.4);
       overflow-y: auto;
-      opacity: 0;
-      visibility: hidden;
+      opacity: 0; visibility: hidden;
       transform: translateY(-10px);
       transition: all 0.3s ease;
       z-index: 100;
     }
-
-    .radio.dark .dropdown-menu {
-      background: #1a1a1a;
-      box-shadow: 0 12px 32px rgba(0,0,0,0.8);
-    }
-
-    .dropdown-menu.show {
-      opacity: 1;
-      visibility: visible;
-      transform: translateY(0);
-    }
-
+    .radio.dark .dropdown-menu { background: #1a1a1a; box-shadow: 0 12px 32px rgba(0,0,0,0.8); }
+    .dropdown-menu.show { opacity: 1; visibility: visible; transform: translateY(0); }
     .menu-item {
-      padding: 12px 16px;
-      font-size: 1.1rem;
-      color: #333;
-      cursor: pointer;
-      transition: all 0.2s;
+      padding: 12px 16px; font-size: 1.1rem; color: #333;
+      cursor: pointer; transition: all 0.2s;
       border-bottom: 1px solid #eee;
+      display: flex; justify-content: space-between; align-items: center;
     }
-
-    .radio.dark .menu-item {
-      color: #ff8c00;
-      border-bottom: 1px solid #333;
-    }
-
-    .menu-item:hover {
-      background: #f0f0f0;
-      padding-left: 20px;
-    }
-
-    .radio.dark .menu-item:hover {
-      background: #2a2a2a;
-    }
-
-    .menu-item.active {
-      background: #ff6b35;
-      color: #fff;
-      font-weight: bold;
-    }
-
-    .radio.dark .menu-item.active {
-      background: #ff4500;
-    }
+    .radio.dark .menu-item { color: #ff8c00; border-bottom: 1px solid #333; }
+    .menu-item:hover { background: #f0f0f0; padding-left: 20px; }
+    .radio.dark .menu-item:hover { background: #2a2a2a; }
+    .menu-item.active { background: #ff6b35; color: #fff; font-weight: bold; }
+    .radio.dark .menu-item.active { background: #ff4500; }
+    .favorite-star { font-size: 1.2rem; opacity: 0.7; }
 
     /* ======================
-       PARRILLA + PLAYBACK INDICATOR ANIMADO
+       STATUS MESSAGE
+       ====================== */
+    .status-msg {
+      position: absolute; bottom: 10%; left: 50%; transform: translateX(-50%);
+      background: rgba(0,0,0,0.8); color: #ff6b35;
+      padding: 8px 16px; border-radius: 8px;
+      font-family: 'Courier New', monospace; font-size: 0.9rem;
+      opacity: 0; transition: opacity 0.3s ease;
+      z-index: 100; pointer-events: none; white-space: nowrap;
+    }
+    .status-msg.show { opacity: 1; }
+
+    /* ======================
+       PARRILLA + ONDAS GRANDES
        ====================== */
     .grill {
-      position: absolute;
-      top: 28%;
-      left: 50%;
-      transform: translateX(-50%);
-      width: 58%;
-      max-width: 520px;
-      height: 28%;
-      min-height: 160px;
+      position: absolute; top: 28%; left: 50%; transform: translateX(-50%);
+      width: 70%; max-width: 700px; height: 28%; min-height: 180px;
       background: repeating-linear-gradient(45deg, #d4af37 0px, #d4af37 10px, #c9a63a 10px, #c9a63a 20px);
       border-radius: 22px;
       box-shadow: inset 0 0 24px rgba(0,0,0,0.3), 0 8px 16px rgba(0,0,0,0.2);
-      overflow: hidden;
-      position: relative;
-      z-index: 5;
+      overflow: hidden; position: relative; z-index: 5;
     }
-
     .radio.dark .grill {
       background: repeating-linear-gradient(45deg, #8b5a2b 0px, #8b5a2b 10px, #a0522d 10px, #a0522d 20px);
       box-shadow: inset 0 0 24px rgba(0,0,0,0.7), 0 8px 16px rgba(0,0,0,0.6);
     }
-
     .grill::before {
-      content: '';
-      position: absolute;
-      inset: 14px;
-      background: #111;
-      border-radius: 14px;
-      z-index: 1;
+      content: ''; position: absolute; inset: 14px;
+      background: #111; border-radius: 14px; z-index: 1;
     }
-
     .radio.dark .grill::before { background: #000; }
 
-    /* PLAYBACK INDICATOR - ANIMADO SOLO CUANDO HAY SONIDO */
     .playback-indicator {
-      position: absolute;
-      bottom: 18px;
-      left: 50%;
-      transform: translateX(-50%);
-      width: 70%;
-      height: 24px;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      gap: 6px;
-      z-index: 2;
-      opacity: 0;
-      transition: opacity 0.4s ease;
+      position: absolute; bottom: 25px; left: 50%; transform: translateX(-50%);
+      width: 90%; height: 50px;
+      display: flex; align-items: center; justify-content: center;
+      gap: 6px; z-index: 2;
     }
-
-    .playback-indicator.active {
-      opacity: 1;
-    }
-
     .wave-bar {
-      width: 3px;
-      height: 16px;
-      background: #ff6b35;
-      border-radius: 2px;
-      opacity: 0;
-      transform: scaleY(0.3);
-      animation: wave 1.2s ease-in-out infinite;
-      box-shadow: 0 0 6px #ff6b35;
+      width: 4px; height: 40px;
+      background: #ff6b35; border-radius: 3px;
+      opacity: 0.4; transform: scaleY(0.3);
+      box-shadow: 0 0 12px #ff6b35;
+      transition: opacity 0.3s ease;
     }
-
     .radio.dark .wave-bar {
       background: #ff4500;
-      box-shadow: 0 0 10px #ff4500;
+      box-shadow: 0 0 16px #ff4500;
     }
-
+    .playback-indicator.playing .wave-bar {
+      animation: wave 1.2s ease-in-out infinite;
+    }
     .wave-bar:nth-child(1) { animation-delay: 0s; }
     .wave-bar:nth-child(2) { animation-delay: 0.1s; }
     .wave-bar:nth-child(3) { animation-delay: 0.2s; }
     .wave-bar:nth-child(4) { animation-delay: 0.3s; }
     .wave-bar:nth-child(5) { animation-delay: 0.4s; }
+    .wave-bar:nth-child(6) { animation-delay: 0.5s; }
+    .wave-bar:nth-child(7) { animation-delay: 0.6s; }
+    .wave-bar:nth-child(8) { animation-delay: 0.7s; }
+    .wave-bar:nth-child(9) { animation-delay: 0.8s; }
+    .wave-bar:nth-child(10) { animation-delay: 0.9s; }
 
     @keyframes wave {
-      0%, 100% {
-        transform: scaleY(0.3);
-        opacity: 0.4;
-      }
-      50% {
-        transform: scaleY(1);
-        opacity: 1;
-      }
+      0%, 100% { transform: scaleY(0.3); opacity: 0.4; }
+      50% { transform: scaleY(1); opacity: 1; }
     }
 
     /* ======================
-       CARRUSEL CIRCULAR + ESTACIÓN SIEMPRE EN EL CENTRO
+       CARRUSEL: ESTACIÓN ROJA Y CENTRADA
        ====================== */
     .dial-window {
-      position: absolute;
-      bottom: 22%;
-      left: 50%;
-      transform: translateX(-50%);
-      width: 70%;
-      max-width: 680px;
-      height: 14%;
-      min-height: 90px;
+      position: absolute; bottom: 22%; left: 50%; transform: translateX(-50%);
+      width: 70%; max-width: 680px; height: 14%; min-height: 90px;
       background: linear-gradient(to bottom, #222, #111);
       border-radius: 18px;
       box-shadow: inset 0 10px 20px rgba(255,255,255,0.1), 0 10px 20px rgba(0,0,0,0.4);
-      overflow: hidden;
-      border: 5px solid #333;
-      z-index: 1;
-      display: flex;
-      align-items: center;
-      padding: 0 10px;
+      overflow: hidden; border: 5px solid #333;
+      z-index: 1; display: flex; align-items: center; padding: 0 10px;
       perspective: 1000px;
     }
-
     .radio.dark .dial-window {
       background: linear-gradient(to bottom, #0a0a0a, #000);
       box-shadow: inset 0 10px 20px rgba(255,107,53,0.1), 0 10px 20px rgba(0,0,0,0.8);
     }
-
-    .station-carousel {
-      width: 100%;
-      overflow: hidden;
-      position: relative;
-      height: 100%;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-    }
-
+    .station-carousel { width: 100%; overflow: hidden; position: relative; height: 100%; display: flex; align-items: center; justify-content: center; }
     .station-track {
-      display: flex;
-      transition: transform 0.6s cubic-bezier(0.4, 0, 0.2, 1);
-      gap: 12px;
-      padding: 0 20px;
-      height: 100%;
-      align-items: center;
-      will-change: transform;
+      display: flex; transition: transform 0.6s cubic-bezier(0.32, 0, 0.07, 1);
+      gap: 12px; padding: 0 20px; height: 100%; align-items: center; will-change: transform;
     }
-
     .station-item {
-      flex: 0 0 auto;
-      min-width: 120px;
-      text-align: center;
-      font-weight: bold;
-      font-size: 1.3vw;
-      color: #ccc;
-      text-shadow: 0 1px 2px #000;
-      transition: all 0.4s ease;
-      cursor: pointer;
-      padding: 6px 8px;
-      border-radius: 6px;
-      white-space: nowrap;
-      overflow: hidden;
-      text-overflow: ellipsis;
-      position: relative;
-      transform: scale(0.85);
-      opacity: 0.6;
-      z-index: 1;
+      flex: 0 0 auto; min-width: 120px; text-align: center;
+      font-weight: bold; font-size: 1.3vw; color: #ccc;
+      text-shadow: 0 1px 2px #000; transition: all 0.4s ease;
+      cursor: pointer; padding: 6px 8px; border-radius: 6px;
+      white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+      position: relative; transform: scale(0.85); opacity: 0.6; z-index: 1;
     }
+    .radio.dark .station-item { color: #ff8c00; }
 
-    .radio.dark .station-item {
-      color: #ff8c00;
-    }
-
-    /* ESTACIÓN CENTRADA */
+    /* ESTACIÓN EN REPRODUCCIÓN: ROJO BRILLANTE Y CENTRADA */
     .station-item.center {
-      transform: scale(1.2);
-      opacity: 1;
-      color: #fff;
-      font-size: 1.5vw;
+      transform: scale(1.4) !important;
+      opacity: 1 !important;
+      color: #fff !important;
+      background: #c00 !important;
+      font-size: 1.9vw !important;
+      font-weight: 900 !important;
       text-shadow: 
-        0 0 8px #ff6b35,
-        0 0 16px #ff4500,
-        0 0 24px #ff4500,
-        0 0 32px #ff4500;
-      background: rgba(255,107,53,0.3);
-      z-index: 3;
-      animation: pulseGlow 1.5s ease-in-out infinite alternate;
+        0 0 10px #ff0000,
+        0 0 20px #ff0000,
+        0 0 30px #ff0000,
+        0 0 40px #ff0000 !important;
+      border-radius: 12px !important;
+      padding: 10px 16px !important;
+      z-index: 3 !important;
+      animation: pulseRed 1.5s ease-in-out infinite alternate;
     }
-
-    @keyframes pulseGlow {
-      0% {
-        text-shadow: 
-          0 0 8px #ff6b35,
-          0 0 16px #ff4500,
-          0 0 24px #ff4500,
-          0 0 32px #ff4500;
-        transform: scale(1.2);
+    @keyframes pulseRed {
+      0% { 
+        text-shadow: 0 0 10px #ff0000, 0 0 20px #ff0000, 0 0 30px #ff0000, 0 0 40px #ff0000;
+        transform: scale(1.4);
       }
-      100% {
-        text-shadow: 
-          0 0 12px #ff6b35,
-          0 0 24px #ff4500,
-          0 0 36px #ff4500,
-          0 0 48px #ff4500;
-        transform: scale(1.25);
+      100% { 
+        text-shadow: 0 0 14px #ff0000, 0 0 28px #ff0000, 0 0 42px #ff0000, 0 0 56px #ff0000;
+        transform: scale(1.45);
       }
     }
+    .station-item.adjacent { transform: scale(1); opacity: 0.8; z-index: 2; }
+    .station-item.far { transform: scale(0.7); opacity: 0.3; z-index: 1; }
+    .station-item:hover:not(.center) { opacity: 0.9; transform: scale(0.95); }
 
-    .station-item.adjacent {
-      transform: scale(1);
-      opacity: 0.8;
-      z-index: 2;
-    }
-
-    .station-item.far {
-      transform: scale(0.7);
-      opacity: 0.3;
-      z-index: 1;
-    }
-
-    .station-item:hover:not(.center) {
-      opacity: 0.9;
-      transform: scale(0.95);
-    }
-
-    /* MARCADOR TRIÁNGULO INVERTIDO */
     .station-marker {
-      position: absolute;
-      top: -32px;
-      left: 50%;
-      transform: translateX(-50%);
-      width: 0;
-      height: 0;
+      position: absolute; top: -32px; left: 50%; transform: translateX(-50%);
+      width: 0; height: 0;
       border-left: 16px solid transparent;
       border-right: 16px solid transparent;
       border-top: 20px solid #c00;
-      box-shadow: 
-        0 0 16px #c00,
-        0 0 24px #c00,
-        0 4px 8px rgba(0,0,0,0.6);
-      z-index: 10;
-      pointer-events: none;
-      transition: left 0.6s cubic-bezier(0.4, 0, 0.2, 1);
+      box-shadow: 0 0 16px #c00, 0 0 24px #c00, 0 4px 8px rgba(0,0,0,0.6);
+      z-index: 10; pointer-events: none;
+      transition: left 0.6s cubic-bezier(0.32, 0, 0.07, 1);
     }
-
     .radio.dark .station-marker {
       border-top-color: #ff6b35;
-      box-shadow: 
-        0 0 20px #ff4500,
-        0 0 30px #ff4500,
-        0 4px 12px rgba(0,0,0,0.8);
+      box-shadow: 0 0 20px #ff4500, 0 0 30px #ff4500, 0 4px 12px rgba(0,0,0,0.8);
     }
 
     /* ======================
        CONTROLES
        ====================== */
     .playback-controls {
-      position: absolute;
-      bottom: 5%;
-      left: 50%;
-      transform: translateX(-50%);
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      gap: 12px;
-      z-index: 20;
-      width: 85%;
-      max-width: 650px;
+      position: absolute; bottom: 5%; left: 50%; transform: translateX(-50%);
+      display: flex; flex-direction: column; align-items: center;
+      gap: 12px; z-index: 20; width: 85%; max-width: 650px;
     }
-
-    .control-buttons {
-      display: flex;
-      justify-content: center;
-      gap: 10px;
-      flex-wrap: wrap;
-      width: 100%;
-    }
-
+    .control-buttons { display: flex; justify-content: center; gap: 10px; flex-wrap: wrap; width: 100%; }
     button.control-btn {
-      width: 60px;
-      height: 60px;
+      width: 60px; height: 60px;
       background: radial-gradient(circle at 30% 30%, #f0f0f0, #d0d0d0);
-      border: 4px solid #999;
-      border-radius: 50%;
-      font-size: 18px;
-      font-weight: bold;
-      color: #333;
+      border: 4px solid #999; border-radius: 50%;
+      font-size: 18px; font-weight: bold; color: #333;
       cursor: pointer;
       box-shadow: 0 8px 16px rgba(0,0,0,0.3), inset 0 2px 4px rgba(255,255,255,0.8);
-      transition: all 0.15s;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      font-family: 'Courier New', monospace;
-      text-transform: uppercase;
-      letter-spacing: 1px;
+      transition: all 0.15s; display: flex; align-items: center; justify-content: center;
+      font-family: 'Courier New', monospace; text-transform: uppercase; letter-spacing: 1px;
     }
-
     .radio.dark button.control-btn {
       background: radial-gradient(circle at 30% 30%, #2a2a2a, #1a1a1a);
-      border: 4px solid #444;
-      color: #ff6b35;
+      border: 4px solid #444; color: #ff6b35;
       box-shadow: 0 8px 16px rgba(0,0,0,0.7), inset 0 2px 4px rgba(255,107,53,0.2);
     }
-
-    button.control-btn:hover {
-      transform: translateY(-2px);
-      box-shadow: 0 12px 24px rgba(0,0,0,0.4);
-    }
-
-    button.control-btn:active {
-      transform: translateY(2px);
-      box-shadow: 0 4px 8px rgba(0,0,0,0.4);
-    }
+    button.control-btn:hover { transform: translateY(-2px); box-shadow: 0 12px 24px rgba(0,0,0,0.4); }
+    button.control-btn:active { transform: translateY(2px); box-shadow: 0 4px 8px rgba(0,0,0,0.4); }
 
     .volume-container {
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      gap: 10px;
-      width: 100%;
-      padding: 0 10px;
+      display: flex; align-items: center; justify-content: center;
+      gap: 10px; width: 100%; padding: 0 10px;
     }
-
     .volume-btn {
-      width: 50px;
-      height: 50px;
-      background: radial-gradient(circle at 30% 30%, #f0f0f0, #d0d0d0);
-      border: 3px solid #999;
-      border-radius: 50%;
-      font-size: 22px;
-      font-weight: bold;
-      color: #333;
-      cursor: pointer;
-      box-shadow: 0 6px 12px rgba(0,0,0,0.3);
-      transition: all 0.15s;
-      display: flex;
-      align-items: center;
-      justify-content: center;
+      width: 50px; height: 50px;
+      background: radial-gradient(circle at 30% 30%, #f0f0f0, #d0d0f0);
+      border: 3px solid #999; border-radius: 50%;
+      font-size: 22px; font-weight: bold; color: #333;
+      cursor: pointer; box-shadow: 0 6px 12px rgba(0,0,0,0.3);
+      transition: all 0.15s; display: flex; align-items: center; justify-content: center;
       font-family: 'Courier New', monospace;
     }
-
     .radio.dark .volume-btn {
       background: radial-gradient(circle at 30% 30%, #2a2a2a, #1a1a1a);
-      border: 3px solid #444;
-      color: #ff6b35;
+      border: 3px solid #444; color: #ff6b35;
       box-shadow: 0 6px 12px rgba(0,0,0,0.7);
     }
-
     .volume-btn:hover { transform: translateY(-2px); }
     .volume-btn:active { transform: translateY(2px); }
 
     .volume-slider {
-      -webkit-appearance: none;
-      width: 100%;
-      max-width: 300px;
-      height: 8px;
-      border-radius: 5px;
-      background: #ddd;
-      outline: none;
-      transition: background 0.3s;
+      -webkit-appearance: none; width: 100%; max-width: 300px;
+      height: 8px; border-radius: 5px; background: #ddd;
+      outline: none; transition: background 0.3s;
     }
-
     .volume-slider::-webkit-slider-thumb {
-      -webkit-appearance: none;
-      width: 20px;
-      height: 20px;
-      border-radius: 50%;
-      background: #ff6b35;
-      cursor: pointer;
+      -webkit-appearance: none; width: 20px; height: 20px;
+      border-radius: 50%; background: #ff6b35; cursor: pointer;
       box-shadow: 0 0 8px rgba(255,107,53,0.6);
     }
-
-    .radio.dark .volume-slider {
-      background: #333;
-    }
-
+    .radio.dark .volume-slider { background: #333; }
     .radio.dark .volume-slider::-webkit-slider-thumb {
-      background: #ff4500;
-      box-shadow: 0 0 12px #ff4500;
+      background: #ff4500; box-shadow: 0 0 12px #ff4500;
     }
-
     .volume-value {
-      font-family: 'Courier New', monospace;
-      font-weight: bold;
-      font-size: 1.4vw;
-      color: #333;
-      min-width: 50px;
-      text-align: center;
+      font-family: 'Courier New', monospace; font-weight: bold;
+      font-size: 1.4vw; color: #333; min-width: 50px; text-align: center;
     }
-
     .radio.dark .volume-value { color: #ff8c00; }
 
     .control-panel {
-      margin-top: 20px;
-      background: #1a1a1a;
-      padding: 16px 30px;
-      border-radius: 14px;
-      color: #ff6b35;
-      font-family: 'Courier New', monospace;
-      font-size: 1.1vw;
-      box-shadow: 0 10px 24px rgba(0,0,0,0.5);
-      text-align: center;
-      width: 90vw;
-      max-width: 1100px;
+      margin-top: 20px; background: #1a1a1a; padding: 12px 30px;
+      border-radius: 14px; color: #ff6b35; font-family: 'Courier New', monospace;
+      font-size: 1.1vw; box-shadow: 0 10px 24px rgba(0,0,0,0.5);
+      text-align: center; width: 90vw; max-width: 1100px;
     }
-
-    body.dark .control-panel {
-      background: #000;
-      box-shadow: 0 10px 24px rgba(0,0,0,0.9);
-    }
-
-    .freq { font-size: 1.6vw; font-weight: bold; color: #ff6b35; }
+    body.dark .control-panel { background: #000; box-shadow: 0 10px 24px rgba(0,0,0,0.9); }
+    .status { font-size: 1.2vw; }
 
     @media (max-width: 768px) {
-      .clock-face { font-size: 5.5vw !important; }
-      .playback-indicator { gap: 4px; }
-      .wave-bar { width: 2px; height: 12px; }
-      .control-buttons { gap: 6px; }
-      button.control-btn { width: 50px; height: 50px; font-size: 16px; }
-      .volume-btn { width: 40px; height: 40px; font-size: 18px; }
-      .volume-slider { max-width: 200px; }
-      .volume-value { font-size: 3.5vw; }
-      .logo, .control-panel, .freq { font-size: 3.5vw !important; }
-      .station-item { font-size: 2.5vw !important; min-width: 80px; }
-      .station-item.center { font-size: 3.2vw !important; }
+      .playback-indicator { gap: 5px; height: 40px; }
+      .wave-bar { width: 3px; height: 32px; }
+      .station-item.center { font-size: 3.5vw !important; }
       .station-marker { top: -28px; border-left: 14px solid transparent; border-right: 14px solid transparent; border-top: 18px solid #c00; }
-      .top-controls { gap: 10px; }
-      #powerBtn { width: 60px; height: 36px; font-size: 10px; }
-      #powerBtn::before { width: 24px; height: 24px; top: 4px; left: 4px; }
-      #powerBtn.on::before { transform: translateX(28px); }
-      .hamburger { width: 32px; height: 32px; }
-      .stations-label { font-size: 9px; }
-      .dropdown-menu { width: 240px; max-height: 280px; }
-      .menu-item { font-size: 1rem; padding: 10px 14px; }
     }
   </style>
 </head>
 <body>
+
+  <!-- STATUS MESSAGE -->
+  <div class="status-msg" id="statusMsg"></div>
 
   <!-- RADIO -->
   <div class="radio" id="radio">
@@ -771,27 +485,24 @@
 
       <div class="stations-btn" id="stationsBtn">
         <div class="hamburger">
-          <span></span>
-          <span></span>
-          <span></span>
+          <span></span><span></span><span></span>
         </div>
         <div class="stations-label">ESTACIONES</div>
       </div>
       <div class="dropdown-menu" id="dropdownMenu"></div>
     </div>
 
-    <!-- Parrilla con Playback Indicator ANIMADO -->
+    <!-- Parrilla con ONDAS GRANDES -->
     <div class="grill">
       <div class="playback-indicator" id="playbackIndicator">
-        <div class="wave-bar"></div>
-        <div class="wave-bar"></div>
-        <div class="wave-bar"></div>
-        <div class="wave-bar"></div>
+        <div class="wave-bar"></div><div class="wave-bar"></div><div class="wave-bar"></div>
+        <div class="wave-bar"></div><div class="wave-bar"></div><div class="wave-bar"></div>
+        <div class="wave-bar"></div><div class="wave-bar"></div><div class="wave-bar"></div>
         <div class="wave-bar"></div>
       </div>
     </div>
 
-    <!-- Dial con Carrusel Circular -->
+    <!-- Dial con Carrusel ROJO Y CENTRADO -->
     <div class="dial-window">
       <div class="station-carousel">
         <div class="station-track" id="stationTrack"></div>
@@ -802,11 +513,11 @@
     <!-- CONTROLES -->
     <div class="playback-controls">
       <div class="control-buttons">
-        <button class="control-btn" onclick="tunePrev()" title="Previous Track">PRE</button>
-        <button class="control-btn" id="playPauseBtn" onclick="togglePlayPause()" title="Play/Pause">PLA</button>
-        <button class="control-btn" onclick="tuneNext()" title="Next Track">NEX</button>
-        <button class="control-btn" id="muteBtn" onclick="toggleMute()" title="Mute">MUT</button>
-        <button class="control-btn" id="themeBtn" onclick="toggleTheme()" title="Dark/Light">THE</button>
+        <button class="control-btn" onclick="tunePrev()" title="Anterior">PRE</button>
+        <button class="control-btn" id="playPauseBtn" onclick="togglePlayPause()" title="Reproducir/Pausar">PLA</button>
+        <button class="control-btn" onclick="tuneNext()" title="Siguiente">NEX</button>
+        <button class="control-btn" id="muteBtn" onclick="toggleMute()" title="Silenciar">MUT</button>
+        <button class="control-btn" id="themeBtn" onclick="toggleTheme()" title="Tema">THE</button>
       </div>
 
       <div class="volume-container">
@@ -818,117 +529,124 @@
     </div>
   </div>
 
-  <!-- PANEL DE ESTADO -->
+  <!-- PANEL INFERIOR LIMPIO -->
   <div class="control-panel">
-    <div class="status">CRadio – <span id="currentStation">LOFI 24/7</span> <span id="powerStatus" style="color:#0f0;">(ON)</span></div>
-    <div class="freq" id="currentFreq">LOFI 24/7</div>
-    <div class="status">Estado: <span id="playStatus">Reproduciendo</span></div>
+    <div class="status">Estado: <span id="playStatus">Reproduciendo</span> | <span id="powerStatus" style="color:#0f0;">(ON)</span></div>
   </div>
 
   <!-- AUDIO -->
   <audio id="radioAudio" preload="auto" crossorigin="anonymous"></audio>
 
   <script>
-    // ESTACIONES
+    // ESTACIONES (SIN "RADIO")
     const stationsList = [
-      { name: 'LOFI 24/7', url: 'https://ec3.yesstreaming.net:3755/stream' },
-      { name: 'Radio Oxígeno', url: 'https://mdstrm.com/audio/5fab0687bcd6c2389ee9480c/icecast.audio' },
-      { name: "Radio Magica", url: 'https://mdstrm.com/audio/6839e28eb3fdc597ac2e2e43/icecast.audio?property=aiir&_=224873' },
-      { name: 'Radio fit', url: 'https://node-15.zeno.fm/fb9sp98vc5zuv' },
-      { name: 'Radio Felicidad', url: 'https://mdstrm.com/audio/5fad731fcf097a068af3c8f7/icecast.audio' },
-      { name: 'Radio RPP', url: 'https://mdstrm.com/audio/5fab3416b5f9ef165cfab6e9/icecast.audio' },
-      { name: 'Radio Exitosa', url: 'https://stream.zeno.fm/csy4vzackf9uv' },
-      { name: 'Radio La Inolvidable', url: 'https://27263.live.streamtheworld.com/CRP_LI_SC?csegid=30008&dist=30008' },
-      { name: 'Radio Panamericana', url: 'https://mdstrm.com/audio/6598b62dded1380470f4e539/icecast.audio' },
-      { name: 'Radio Ritmo Romántica', url: 'https://23113.live.streamtheworld.com/CRP_RIT_SC?csegid=30008&dist=30008' },
-      { name: 'Radio Corazón', url: 'https://mdstrm.com/audio/5fada514fc16c006bd63370f/icecast.audio' },
-      { name: 'Radio Radiomar', url: 'https://23113.live.streamtheworld.com/CRP_MARAAC_SC' },
-      { name: 'Radio Nueva Q', url: 'https://27163.live.streamtheworld.com/CRP_NQ_SC?csegid=30008&dist=30008' },
-      { name: 'Radio Planeta', url: 'https://mdstrm.com/audio/6839e274f40e6b9832e37633/icecast.audio?property=aiir&_=481938' },
-      { name: 'Radio Onda Cero', url: 'https://mdstrm.com/audio/6598b65ab398c90871aff8cc/icecast.audio' },
-      { name: 'Radio Z Rock & Pop', url: 'https://radioz.egostreaming.pe/radio/3e4f6a1b2c3d4e567890abcd/' },
-      { name: 'Radio Studio 92', url: 'https://stream.zeno.fm/1k4z7k6x7x8uv' },
-      { name: 'Radio Moda', url: 'https://14613.live.streamtheworld.com/CRP_MOD_SC?csegid=30008&dist=30008' },
-      { name: 'Radio Exitoso', url: 'https://neptuno-2-audio.mediaserver.digital/79525baf-b0f5-4013-a8bd-3c5c293c6561' },
-      { name: 'Radio Oasis', url: 'https://stream.zeno.fm/3bhmjhlsl0wvv' },
-      { name: 'Radio las Quenas', url: 'https://radio.lnx.pe:7000/stream' },
-      { name: 'Radio Salkantay', url: 'http://167.114.118.119:7662/stream' },
-      { name: 'Radio Mega Stereo', url: 'https://cast1.my-control-panel.com/proxy/megaestereo/stream' },
-      { name: 'Radio Coca Raymi', url: 'https://stream.zeno.fm/di4yvkfirz0vv' },
-      { name: 'Radio Naranjal', url: 'https://stream.zeno.fm/9k3v7n8k7x8uv' },
+      { name: 'LOFI 24/7', url: 'https://ec3.yesstreaming.net:3755/stream', favorite: true },
+      { name: 'Oxígeno', url: 'https://mdstrm.com/audio/5fab0687bcd6c2389ee9480c/icecast.audio' },
+      { name: "Magica", url: 'https://mdstrm.com/audio/6839e28eb3fdc597ac2e2e43/icecast.audio?property=aiir&_=224873' },
+      { name: 'fit', url: 'https://node-15.zeno.fm/fb9sp98vc5zuv' },
+      { name: 'Felicidad', url: 'https://mdstrm.com/audio/5fad731fcf097a068af3c8f7/icecast.audio' },
+      { name: 'RPP', url: 'https://mdstrm.com/audio/5fab3416b5f9ef165cfab6e9/icecast.audio' },
+      { name: 'Exitosa', url: 'https://stream.zeno.fm/csy4vzackf9uv' },
+      { name: 'La Inolvidable', url: 'https://27263.live.streamtheworld.com/CRP_LI_SC?csegid=30008&dist=30008' },
+      { name: 'Panamericana', url: 'https://mdstrm.com/audio/6598b62dded1380470f4e539/icecast.audio' },
+      { name: 'Ritmo Romántica', url: 'https://23113.live.streamtheworld.com/CRP_RIT_SC?csegid=30008&dist=30008' },
+      { name: 'Corazón', url: 'https://mdstrm.com/audio/5fada514c006bd63370f/icecast.audio', favorite: true },
+      { name: 'Radiomar', url: 'https://23113.live.streamtheworld.com/CRP_MARAAC_SC' },
+      { name: 'Nueva Q', url: 'https://27163.live.streamtheworld.com/CRP_NQ_SC?csegid=30008&dist=30008' },
+      { name: 'Planeta', url: 'https://mdstrm.com/audio/6839e274f40e6b9832e37633/icecast.audio?property=aiir&_=481938' },
+      { name: 'Onda Cero', url: 'https://mdstrm.com/audio/6598b65ab398c90871aff8cc/icecast.audio' },
+      { name: 'Z Rock & Pop', url: 'https://radioz.egostreaming.pe/radio/3e4f6a1b2c3d4e567890abcd/' },
+      { name: 'Studio 92', url: 'https://stream.zeno.fm/1k4z7k6x7x8uv' },
+      { name: 'Moda', url: 'https://14613.live.streamtheworld.com/CRP_MOD_SC?csegid=30008&dist=30008' },
+      { name: 'Exitoso', url: 'https://neptuno-2-audio.mediaserver.digital/79525baf-b0f5-4013-a8bd-3c5c293c6561' },
+      { name: 'Oasis', url: 'https://stream.zeno.fm/3bhmjhlsl0wvv' },
+      { name: 'las Quenas', url: 'https://radio.lnx.pe:7000/stream' },
+      { name: 'Salkantay', url: 'http://167.114.118.119:7662/stream' },
+      { name: 'Mega Stereo', url: 'https://cast1.my-control-panel.com/proxy/megaestereo/stream' },
+      { name: 'Coca Raymi', url: 'https://stream.zeno.fm/di4yvkfirz0vv' },
+      { name: 'Naranjal', url: 'https://stream.zeno.fm/9k3v7n8k7x8uv' },
       { name: 'Rock en Español', url: 'https://stream.zeno.fm/0vgy8qv3feruv' },
-      { name: 'Radio Disney', url: 'https://26643.live.streamtheworld.com/DISNEY_PER_LM_SC?dist=web-radiodisney-disneylatino' },
-      { name: 'Radio 1', url: 'https://rugby-mad-nokia-admitted.trycloudflare.com/stream?1718287105538' },
-      { name: 'Radio 2', url: 'https://panelautodj.innovatestream.pe:10951' },
+      { name: 'Disney', url: 'https://26643.live.streamtheworld.com/DISNEY_PER_LM_SC?dist=web-radiodisney-disneylatino' },
+      { name: '1', url: 'https://rugby-mad-nokia-admitted.trycloudflare.com/stream?1718287105538' },
+      { name: '2', url: 'https://panelautodj.innovatestream.pe:10951' },
     ];
 
     // Estado
-    let volume = 50;
-    let isMuted = false;
-    let isPlaying = true;
-    let isPowered = true;
-    let isDark = false;
-    let currentIndex = 0;
+    let volume = 50, isMuted = false, isPlaying = true, isPowered = true, isDark = false, currentIndex = 0;
     const audio = document.getElementById('radioAudio');
     const stationTrack = document.getElementById('stationTrack');
     const dropdownMenu = document.getElementById('dropdownMenu');
-    const stationsBtn = document.getElementById('stationsBtn');
     const stationMarker = document.getElementById('stationMarker');
     const playbackIndicator = document.getElementById('playbackIndicator');
+    const statusMsg = document.getElementById('statusMsg');
+    let itemWidthCache = null, resizeTimeout = null;
 
     // Persistencia
     function saveState() {
       const state = { currentIndex, isDark, isPowered, isPlaying, volume, isMuted };
       localStorage.setItem('cradioState', JSON.stringify(state));
     }
-
     function loadState() {
       const saved = localStorage.getItem('cradioState');
-      if (!saved) return null;
-      try { return JSON.parse(saved); } catch (e) { return null; }
+      return saved ? JSON.parse(saved) : null;
     }
 
-    // Cargar estaciones (duplicadas para efecto circular)
+    function getItemWidth() {
+      if (!itemWidthCache) {
+        const item = document.querySelector('.station-item');
+        itemWidthCache = item ? item.offsetWidth + 12 : 132;
+      }
+      return itemWidthCache;
+    }
+
+    function showStatus(msg, timeout = 3000) {
+      statusMsg.textContent = msg;
+      statusMsg.classList.add('show');
+      setTimeout(() => statusMsg.classList.remove('show'), timeout);
+    }
+
+    function playStatic() {
+      const overlay = document.createElement('div');
+      overlay.className = 'static-overlay';
+      document.body.appendChild(overlay);
+      setTimeout(() => overlay.remove(), 400);
+    }
+
     function loadAllStations() {
       stationTrack.innerHTML = '';
       const total = stationsList.length;
       const extended = [...stationsList, ...stationsList, ...stationsList];
-
       for (let i = 0; i < extended.length; i++) {
-        const station = extended[i];
         const div = document.createElement('div');
         div.className = 'station-item';
-        div.textContent = station.name;
+        div.textContent = extended[i].name;
         div.dataset.index = i % total;
-        div.onclick = () => playStation(i % total);
+        div.onclick = () => { playStatic(); playStation(i % total); };
         stationTrack.appendChild(div);
       }
-
-      setTimeout(() => centerStation(currentIndex), 100);
+      setTimeout(() => centerStation(currentIndex), 50);
     }
 
-    // Centrar estación actual
+    // CENTRADO PERFECTO + MARCADOR
     function centerStation(index) {
       const items = document.querySelectorAll('.station-item');
+      if (items.length === 0) return;
+
       const total = stationsList.length;
       const offset = total + index;
-      const itemWidth = items[0].offsetWidth + 12;
-      const containerWidth = document.querySelector('.station-carousel').offsetWidth;
+      const itemWidth = getItemWidth();
+      const container = document.querySelector('.station-carousel');
+      const containerWidth = container.offsetWidth;
       const centerOffset = (containerWidth - itemWidth) / 2;
 
       items.forEach((item, i) => {
-        const distance = Math.abs(i - offset);
-        const minDistance = Math.min(distance, extended.length - distance);
-
-        if (minDistance === 0) {
-          item.className = 'station-item center';
-        } else if (minDistance === 1) {
-          item.className = 'station-item adjacent';
-        } else if (minDistance <= 3) {
-          item.className = 'station-item far';
-        } else {
-          item.className = 'station-item';
-        }
+        let distance = Math.abs(i - offset);
+        const wrapDistance = items.length - distance;
+        distance = Math.min(distance, wrapDistance);
+        item.classList.remove('center', 'adjacent', 'far');
+        if (distance === 0) item.classList.add('center');
+        else if (distance === 1) item.classList.add('adjacent');
+        else if (distance <= 3) item.classList.add('far');
       });
 
       const translateX = -offset * itemWidth + centerOffset;
@@ -943,27 +661,24 @@
       }
     }
 
-    // Menú
     function loadMenu() {
       dropdownMenu.innerHTML = '';
       stationsList.forEach((station, i) => {
         const div = document.createElement('div');
         div.className = 'menu-item';
-        div.textContent = station.name;
+        div.innerHTML = `${station.name} ${station.favorite ? '<span class="favorite-star">⭐</span>' : ''}`;
         div.dataset.index = i;
-        div.onclick = () => { playStation(i); closeMenu(); };
+        div.onclick = () => { playStatic(); playStation(i); closeMenu(); };
         dropdownMenu.appendChild(div);
       });
     }
 
     function toggleMenu() { dropdownMenu.classList.toggle('show'); }
     function closeMenu() { dropdownMenu.classList.remove('show'); }
-
-    document.addEventListener('click', (e) => {
+    document.addEventListener('click', e => {
       if (!stationsBtn.contains(e.target) && !dropdownMenu.contains(e.target)) closeMenu();
     });
 
-    // Reloj
     function updateClock() {
       const now = new Date();
       const hours = now.getHours() % 12 || 12;
@@ -971,57 +686,53 @@
       document.getElementById('clockDisplay').textContent = 
         `${hours.toString().padStart(2,'0')}:${minutes.toString().padStart(2,'0')}`;
     }
-    setInterval(updateClock, 1000);
-    updateClock();
+    setInterval(updateClock, 1000); updateClock();
 
-    // Reproducir
     function playStation(index) {
       if (!isPowered) return;
-      currentIndex = index;
-      saveState();
+      currentIndex = index; saveState();
       const station = stationsList[currentIndex];
-      audio.src = station.url;
-      audio.load();
+      audio.src = station.url; audio.load();
 
       document.querySelectorAll('.menu-item').forEach((el, i) => {
         el.classList.toggle('active', i === currentIndex);
       });
 
       centerStation(currentIndex);
+      showStatus('Cargando...', 2000);
+      audio.onplaying = () => showStatus('Conectado', 1500);
+      audio.onerror = () => showStatus('Error: Estación no disponible', 4000);
 
       setTimeout(() => {
-        if (isPlaying && !audio.paused) {
-          playbackIndicator.classList.add('active');
-          audio.play().catch(() => {});
+        if (isPlaying) {
+          audio.play().catch(() => showStatus('Toca PLAY para activar sonido', 3000));
+          updatePlaybackAnimation();
         }
       }, 100);
-
-      document.getElementById('currentStation').textContent = station.name;
-      document.getElementById('currentFreq').textContent = station.name;
     }
 
-    function tuneNext() { if (isPowered) { currentIndex = (currentIndex + 1) % stationsList.length; playStation(currentIndex); } }
-    function tunePrev() { if (isPowered) { currentIndex = (currentIndex - 1 + stationsList.length) % stationsList.length; playStation(currentIndex); } }
+    function tuneNext() { if (isPowered) { playStatic(); currentIndex = (currentIndex + 1) % stationsList.length; playStation(currentIndex); } }
+    function tunePrev() { if (isPowered) { playStatic(); currentIndex = (currentIndex - 1 + stationsList.length) % stationsList.length; playStation(currentIndex); } }
 
-    // Play/Pause
+    function updatePlaybackAnimation() {
+      if (isPlaying && isPowered && !audio.paused && !audio.muted) {
+        playbackIndicator.classList.add('playing');
+      } else {
+        playbackIndicator.classList.remove('playing');
+      }
+    }
+
     function togglePlayPause() {
       if (!isPowered) return;
       isPlaying = !isPlaying;
       const btn = document.getElementById('playPauseBtn');
       btn.textContent = isPlaying ? 'PAU' : 'PLA';
       document.getElementById('playStatus').textContent = isPlaying ? 'Reproduciendo' : 'Pausado';
-      
-      if (isPlaying) {
-        playbackIndicator.classList.add('active');
-        audio.play().catch(() => {});
-      } else {
-        playbackIndicator.classList.remove('active');
-        audio.pause();
-      }
-      saveState();
+      if (isPlaying) audio.play().catch(() => showStatus('Toca PLAY para activar', 3000));
+      else audio.pause();
+      updatePlaybackAnimation(); saveState();
     }
 
-    // Power
     function togglePower() {
       isPowered = !isPowered;
       const radio = document.getElementById('radio');
@@ -1029,88 +740,73 @@
       const powerBtn = document.getElementById('powerBtn');
 
       if (isPowered) {
-        radio.style.opacity = '1';
-        status.textContent = '(ON)';
-        status.style.color = '#0f0';
-        powerBtn.classList.add('on');
-        isPlaying = true;
+        radio.style.opacity = '1'; status.textContent = '(ON)'; status.style.color = '#0f0';
+        powerBtn.classList.add('on'); isPlaying = true;
         document.getElementById('playPauseBtn').textContent = 'PAU';
         document.getElementById('playStatus').textContent = 'Reproduciendo';
-        playbackIndicator.classList.add('active');
-        audio.play().catch(() => {});
+        playStation(currentIndex);
       } else {
-        radio.style.opacity = '0.3';
-        status.textContent = '(OFF)';
-        status.style.color = '#f00';
-        powerBtn.classList.remove('on');
-        isPlaying = false;
+        radio.style.opacity = '0.3'; status.textContent = '(OFF)'; status.style.color = '#f00';
+        powerBtn.classList.remove('on'); isPlaying = false;
         document.getElementById('playPauseBtn').textContent = 'PLA';
         document.getElementById('playStatus').textContent = 'Apagado';
-        playbackIndicator.classList.remove('active');
         audio.pause();
       }
-      saveState();
+      updatePlaybackAnimation(); saveState();
     }
 
-    // Mute
     function toggleMute() {
       if (!isPowered) return;
-      isMuted = !isMuted;
-      audio.muted = isMuted;
+      isMuted = !isMuted; audio.muted = isMuted;
       const btn = document.getElementById('muteBtn');
       btn.textContent = isMuted ? 'UNM' : 'MUT';
       document.getElementById('volumeLevel').textContent = isMuted ? 'MUTE' : volume;
-      saveState();
+      updatePlaybackAnimation(); saveState();
     }
 
-    // Volumen
     function setVolume(val) {
       if (!isPowered || isMuted) return;
-      volume = val;
-      audio.volume = volume / 100;
+      volume = val; audio.volume = volume / 100;
       document.getElementById('volumeLevel').textContent = volume;
-      document.getElementById('volumeSlider').value = volume;
-      saveState();
+      document.getElementById('volumeSlider').value = volume; saveState();
     }
-
     function changeVolume(delta) {
       if (!isPowered || isMuted) return;
       volume = Math.max(0, Math.min(100, volume + delta));
       setVolume(volume);
     }
 
-    // Tema
     function toggleTheme() {
       isDark = !isDark;
-      const body = document.body;
-      const radio = document.getElementById('radio');
+      const body = document.body; const radio = document.getElementById('radio');
       const btn = document.getElementById('themeBtn');
       if (isDark) {
-        body.classList.add('dark');
-        radio.classList.add('dark');
-        btn.textContent = 'LIG';
+        body.classList.add('dark'); radio.classList.add('dark'); btn.textContent = 'LIG';
       } else {
-        body.classList.remove('dark');
-        radio.classList.remove('dark');
-        btn.textContent = 'DAR';
+        body.classList.remove('dark'); radio.classList.remove('dark'); btn.textContent = 'DAR';
       }
       saveState();
     }
 
-    // Inicializar
-    document.addEventListener('DOMContentLoaded', function() {
-      loadAllStations();
-      loadMenu();
-      stationsBtn.addEventListener('click', toggleMenu);
+    document.addEventListener('keydown', e => {
+      if (!isPowered) return;
+      switch(e.key) {
+        case ' ': togglePlayPause(); e.preventDefault(); break;
+        case 'ArrowRight': tuneNext(); break;
+        case 'ArrowLeft': tunePrev(); break;
+        case 'm': case 'M': toggleMute(); break;
+        case '+': case 'ArrowUp': changeVolume(10); break;
+        case '-': case 'ArrowDown': changeVolume(-10); break;
+      }
+    });
 
+    document.addEventListener('DOMContentLoaded', function() {
+      loadAllStations(); loadMenu(); stationsBtn.addEventListener('click', toggleMenu);
       const savedState = loadState();
       if (savedState) {
-        currentIndex = savedState.currentIndex;
-        isDark = savedState.isDark;
-        isPowered = savedState.isPowered;
-        isPlaying = savedState.isPlaying;
-        volume = savedState.volume;
-        isMuted = savedState.isMuted;
+        currentIndex = savedState.currentIndex; isDark = savedState.isDark;
+        isPowered = savedState.isPowered; isPlaying = savedState.isPlaying;
+        volume = savedState.volume; isMuted = savedState.isMuted;
       }
 
       if (isDark) {
@@ -1122,47 +818,18 @@
       const powerBtn = document.getElementById('powerBtn');
       if (isPowered) powerBtn.classList.add('on');
 
-      playStation(currentIndex);
-      setVolume(volume);
+      playStation(currentIndex); setVolume(volume);
+      if (isMuted) { audio.muted = true; document.getElementById('muteBtn').textContent = 'UNM'; document.getElementById('volumeLevel').textContent = 'MUTE'; }
+      if (!isPlaying) { document.getElementById('playPauseBtn').textContent = 'PLA'; document.getElementById('playStatus').textContent = 'Pausado'; }
 
-      if (isMuted) {
-        audio.muted = true;
-        document.getElementById('muteBtn').textContent = 'UNM';
-        document.getElementById('volumeLevel').textContent = 'MUTE';
-      }
-
-      if (!isPlaying) {
-        document.getElementById('playPauseBtn').textContent = 'PLA';
-        document.getElementById('playStatus').textContent = 'Pausado';
-        playbackIndicator.classList.remove('active');
-      }
-
-      // Animar playback solo si hay sonido
-      audio.addEventListener('play', () => {
-        if (isPlaying && isPowered) {
-          playbackIndicator.classList.add('active');
-        }
-      });
-
-      audio.addEventListener('pause', () => {
-        playbackIndicator.classList.remove('active');
-      });
-
-      audio.addEventListener('ended', () => {
-        playbackIndicator.classList.remove('active');
-      });
-
-      let resizeTimer;
+      updatePlaybackAnimation();
       window.addEventListener('resize', () => {
-        clearTimeout(resizeTimer);
-        resizeTimer = setTimeout(() => {
-          centerStation(currentIndex);
-        }, 100);
+        clearTimeout(resizeTimeout); itemWidthCache = null;
+        resizeTimeout = setTimeout(() => centerStation(currentIndex), 100);
       });
-
+      setInterval(updatePlaybackAnimation, 500);
       window.addEventListener('beforeunload', saveState);
     });
   </script>
-
 </body>
 </html>
