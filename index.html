@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>CRadio – Animación de Reproducción</title>
+  <title>CRadio – Reproducción Automática + Control Total</title>
   <style>
     /* ======================
        GLOBAL & BODY
@@ -126,7 +126,6 @@
       text-shadow: 0 0 12px #ff6b35, 0 0 24px #ff4500, 0 2px 4px #000;
     }
 
-    /* ESPACIO NEGRO DEBAJO DEL RELOJ */
     .playback-indicator {
       position: absolute;
       bottom: 20%;
@@ -174,7 +173,6 @@
       }
     }
 
-    /* Pausar animación cuando no hay reproducción */
     .playback-indicator.paused .wave-bar {
       animation-play-state: paused;
       opacity: 0.2;
@@ -194,7 +192,6 @@
       z-index: 15;
     }
 
-    /* BOTÓN POWER: ON/OFF */
     #powerBtn {
       width: 70px;
       height: 40px;
@@ -267,7 +264,6 @@
     #powerBtn.on .on-label { opacity: 1; }
     #powerBtn.on::before { transform: translateX(34px); }
 
-    /* MENU ESTACIONES */
     .menu-container {
       position: relative;
     }
@@ -574,7 +570,6 @@
       box-shadow: 0 2px 4px rgba(0,0,0,0.4);
     }
 
-    /* VOLUMEN */
     .volume-container {
       display: flex;
       align-items: center;
@@ -652,7 +647,6 @@
 
     .radio.dark .volume-value { color: #ff8c00; }
 
-    /* PANEL DE ESTADO */
     .control-panel {
       margin-top: 20px;
       background: #1a1a1a;
@@ -674,7 +668,6 @@
 
     .freq { font-size: 1.6vw; font-weight: bold; color: #ff6b35; }
 
-    /* Responsive */
     @media (max-width: 768px) {
       .clock-face { font-size: 5.5vw !important; }
       .playback-indicator { gap: 4px; }
@@ -744,7 +737,7 @@
     <div class="playback-controls">
       <div class="control-buttons">
         <button class="control-btn" onclick="tunePrev()">Previous Track</button>
-        <button class="control-btn" id="playPauseBtn" onclick="togglePlayPause()">Play</button>
+        <button class="control-btn" id="playPauseBtn" onclick="togglePlayPause()">Pause</button>
         <button class="control-btn" onclick="tuneNext()">Next Track</button>
         <button class="control-btn" id="muteBtn" onclick="toggleMute()">Speaker</button>
         <button class="control-btn" id="themeBtn" onclick="toggleTheme()">Sun</button>
@@ -768,7 +761,7 @@
   </div>
 
   <!-- AUDIO -->
-  <audio id="radioAudio" preload="none" crossorigin="anonymous"></audio>
+  <audio id="radioAudio" preload="auto" crossorigin="anonymous"></audio>
 
   <script>
     // ESTACIONES
@@ -904,7 +897,7 @@
     setInterval(updateClock, 1000);
     updateClock();
 
-    // Reproducir
+    // Reproducir estación
     function playStation(index) {
       if (!isPowered) return;
 
@@ -924,7 +917,12 @@
       centerActiveStation();
       setTimeout(() => {
         updatePointer();
-        if (isPlaying) audio.play().catch(() => {});
+        if (isPlaying) {
+          audio.play().catch(err => {
+            console.warn("Autoplay bloqueado:", err);
+            // No hacemos nada, el usuario debe interactuar
+          });
+        }
       }, 600);
 
       document.getElementById('currentStation').textContent = station.name;
@@ -942,7 +940,6 @@
       btn.textContent = isPlaying ? 'Pause' : 'Play';
       document.getElementById('playStatus').textContent = isPlaying ? 'Reproduciendo' : 'Pausado';
       
-      // Controlar animación de ondas
       if (isPlaying) {
         playbackIndicator.classList.remove('paused');
         audio.play().catch(() => {});
@@ -965,7 +962,7 @@
         status.style.color = '#0f0';
         powerBtn.classList.add('on');
         isPlaying = true;
-        document,getElementById('playPauseBtn').textContent = 'Pause';
+        document.getElementById('playPauseBtn').textContent = 'Pause';
         document.getElementById('playStatus').textContent = 'Reproduciendo';
         playbackIndicator.classList.remove('paused');
         audio.play().catch(() => {});
@@ -1031,9 +1028,12 @@
       loadMenu();
       document.getElementById('powerBtn').classList.add('on');
       menuToggle.addEventListener('click', toggleMenu);
+
+      // Reproducir la primera estación automáticamente
       playStation(0);
       setVolume(50);
 
+      // Ajustar al redimensionar
       let resizeTimer;
       window.addEventListener('resize', () => {
         clearTimeout(resizeTimer);
